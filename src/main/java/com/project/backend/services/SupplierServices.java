@@ -1,6 +1,6 @@
 package com.project.backend.services;
 
-import com.project.backend.entities.Fornecedor;
+import com.project.backend.entities.Supplier;
 import com.project.backend.repositories.FornecedorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,25 +9,25 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class FornecedorServices {
+public class SupplierServices {
 
     @Autowired
     private FornecedorRepository fornecedorRepository;
 
-    public Fornecedor addFornecedor(Fornecedor fornecedor) {
-        return fornecedorRepository.save(fornecedor);
+    public Supplier addFornecedor(Supplier supplier) {
+        return fornecedorRepository.save(supplier);
     }
 
-    public List<Fornecedor> getAllFornecedores() {
+    public List<Supplier> getAllFornecedores() {
         return fornecedorRepository.findAll();
     }
 
-    public Optional<Fornecedor> getFornecedorById(Long id) {
+    public Optional<Supplier> getFornecedorById(Long id) {
         return fornecedorRepository.findById(id);
     }
 
-    public Fornecedor updateFornecedor(Fornecedor fornecedor) {
-        return fornecedorRepository.save(fornecedor);
+    public Supplier updateFornecedor(Supplier supplier) {
+        return fornecedorRepository.save(supplier);
     }
 
     public void deleteFornecedor(Long id) {

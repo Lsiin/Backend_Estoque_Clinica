@@ -1,7 +1,7 @@
 package com.project.backend.services;
 
-import com.project.backend.entities.Estoque;
-import com.project.backend.entities.Produto;
+import com.project.backend.entities.Stock;
+import com.project.backend.entities.Product;
 import com.project.backend.repositories.EstoqueRepository;
 import com.project.backend.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,37 +20,37 @@ public class ProductService {
     private ProductRepository productRepository;
 
 
-    public Produto addProduto(Produto produto) {
-        Produto newProduct = productRepository.save(produto);
+    public Product addProduct(Product product) {
+        Product newProduct = productRepository.save(product);
 
-        Estoque estoque = new Estoque();
-        estoque.setProduto(produto);
-        estoque.setQuantidade(0);
-        estoque.setTipoMovimento("entrada");
-        estoque.setDataMovimento(java.time.LocalDate.now());
+        Stock stock = new Stock();
+        stock.setProduct(product);
+        stock.setQuantidade(0);
+        stock.setTipoMovimento("entrada");
+        stock.setDataMovimento(java.time.LocalDate.now());
 
-        estoqueRepository.save(estoque);
+        estoqueRepository.save(stock);
         return newProduct;
     }
 
 
-    public Produto registerProduct(Produto produto) {
-        return productRepository.save(produto);
+    public Product registerProduct(Product product) {
+        return productRepository.save(product);
     }
 
 
-    public List<Produto> getAllProducts() {
+    public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
 
-    public Optional<Produto> getProductById(long id) {
+    public Optional<Product> getProductById(long id) {
         return productRepository.findById(id);
     }
 
 
-    public Produto updateProduct(Produto produto) {
-        return productRepository.save(produto);
+    public Product updateProduct(Product product) {
+        return productRepository.save(product);
     }
 
 

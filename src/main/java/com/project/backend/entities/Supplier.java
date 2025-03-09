@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class Fornecedor {
+public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,8 +34,8 @@ public class Fornecedor {
 
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
-    private Categoria categoria;
+    private Category category;
 
     @OneToMany(mappedBy = "fornecedor")
-    private List<Produto> produtos;
+    private List<Product> products;
 }

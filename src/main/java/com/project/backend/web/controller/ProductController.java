@@ -1,6 +1,6 @@
 package com.project.backend.web.controller;
 
-import com.project.backend.entities.Produto;
+import com.project.backend.entities.Product;
 import com.project.backend.services.ProductService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,41 +12,41 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("products")
-public class ProdutoController {
+public class ProductController {
 
     @Autowired
     private ProductService productService;
 
 
     @PostMapping("/register")
-    public ResponseEntity<Produto> registerProduct(@RequestBody Produto produto) {
-        Produto novoProduto = productService.registerProduct(produto);
-        return ResponseEntity.status(201).body(novoProduto);
+    public ResponseEntity<Product> registerProduct(@RequestBody Product product) {
+        Product novoProduct = productService.registerProduct(product);
+        return ResponseEntity.status(201).body(novoProduct);
     }
 
 
     @GetMapping
-    public ResponseEntity<List<Produto>> obterTodosProdutos() {
-        List<Produto> produtos = productService.getAllProducts();
-        return ResponseEntity.ok(produtos);
+    public ResponseEntity<List<Product>> obterTodosProdutos() {
+        List<Product> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
     }
 
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<Produto> obterProdutoPorId(@PathVariable Long id) {
-        Optional<Produto> produto = productService.getProductById(id);
+    public ResponseEntity<Product> obterProdutoPorId(@PathVariable Long id) {
+        Optional<Product> produto = productService.getProductById(id);
         return produto.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Produto> atualizarProduto(@PathVariable Long id, @RequestBody Produto produto) {
-        Optional<Produto> produtoExistente = productService.getProductById(id);
+    public ResponseEntity<Product> atualizarProduto(@PathVariable Long id, @RequestBody Product product) {
+        Optional<Product> produtoExistente = productService.getProductById(id);
         if (produtoExistente.isPresent()) {
-            produto.setId(id);
-            Produto produtoAtualizado = productService.updateProduct(produto);
-            return ResponseEntity.ok(produtoAtualizado);
+            product.setId(id);
+            Product productAtualizado = productService.updateProduct(product);
+            return ResponseEntity.ok(productAtualizado);
         }
         return ResponseEntity.notFound().build();
     }
@@ -54,7 +54,7 @@ public class ProdutoController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> excluirProduto(@PathVariable Long id) {
-        Optional<Produto> produtoExistente = productService.getProductById(id);
+        Optional<Product> produtoExistente = productService.getProductById(id);
         if (produtoExistente.isPresent()) {
             productService.deleteProduct(id);
             return ResponseEntity.noContent().build();

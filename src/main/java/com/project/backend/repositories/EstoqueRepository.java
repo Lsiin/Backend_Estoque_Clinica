@@ -1,10 +1,10 @@
 package com.project.backend.repositories;
 
-import com.project.backend.entities.Estoque;
+import com.project.backend.entities.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface EstoqueRepository extends JpaRepository<Estoque, Long> {
+public interface EstoqueRepository extends JpaRepository<Stock, Long> {
 
 }
