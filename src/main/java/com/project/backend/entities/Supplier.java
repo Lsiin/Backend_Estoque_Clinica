@@ -33,9 +33,9 @@ public class Supplier {
 
 
     @ManyToOne
-    @JoinColumn(name = "categoria_id", nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
-    @OneToMany(mappedBy = "fornecedor")
+    @OneToMany(mappedBy = "supplier")
     private List<Product> products;
 }

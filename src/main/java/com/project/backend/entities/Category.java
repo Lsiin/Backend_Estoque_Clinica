@@ -25,6 +25,6 @@ public class Category {
     @Size(min = 3, message = "Name must be at least 3 characters long")
     private String name;
 
-    @OneToMany(mappedBy = "categoria")
+    @OneToMany(mappedBy = "category")
     private List<Product> products;
 }

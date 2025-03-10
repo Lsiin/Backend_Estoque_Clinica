@@ -29,11 +29,11 @@ public class Product {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "fornecedor_id", nullable = false)
+    @JoinColumn(name = "supplier_id", nullable = false)
     private Supplier supplier;
 
     @ManyToOne
-    @JoinColumn(name = "categoria_id", nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @NotNull
@@ -41,6 +41,6 @@ public class Product {
     @Column(nullable = false)
     private float preco;
 
-    @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<Stock> qtdestoque;
 }
