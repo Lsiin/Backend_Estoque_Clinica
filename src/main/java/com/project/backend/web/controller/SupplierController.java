@@ -1,8 +1,6 @@
 package com.project.backend.web.controller;
 
-import com.project.backend.entities.Category;
 import com.project.backend.entities.Supplier;
-import com.project.backend.repositories.CategoryRepository;
 import com.project.backend.repositories.FornecedorRepository;
 import com.project.backend.services.SupplierServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +18,7 @@ public class SupplierController {
     @Autowired
     private SupplierServices supplierServices;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+
 
     @Autowired
     private FornecedorRepository fornecedorRepository;
@@ -29,25 +26,10 @@ public class SupplierController {
 
     @PostMapping("/register")
     public ResponseEntity<Supplier> cadastrarFornecedor(@RequestBody Supplier supplier) {
-
-        String nomeCategoria = supplier.getCategory().getName();
-
-
-        Category categoryExistente = categoryRepository.findByName(nomeCategoria)
-                .orElseGet(() -> {
-                    Category novaCategory = new Category();
-                    novaCategory.setName(nomeCategoria);
-                    return categoryRepository.save(novaCategory);
-                });
-
-
-        supplier.setCategory(categoryExistente);
-
-
-        Supplier supplierSalvo = fornecedorRepository.save(supplier);
-
+        Supplier supplierSalvo = supplierServices.registerSupplier(supplier);
         return ResponseEntity.status(HttpStatus.CREATED).body(supplierSalvo);
     }
+
 
 
 

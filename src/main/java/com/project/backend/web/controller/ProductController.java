@@ -18,12 +18,6 @@ public class ProductController {
     private ProductService productService;
 
 
-    @PostMapping("/register")
-    public ResponseEntity<Product> registerProduct(@RequestBody Product product) {
-        Product novoProduct = productService.registerProduct(product);
-        return ResponseEntity.status(201).body(novoProduct);
-    }
-
 
     @GetMapping
     public ResponseEntity<List<Product>> obterTodosProdutos() {
@@ -39,17 +33,6 @@ public class ProductController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Product> atualizarProduto(@PathVariable Long id, @RequestBody Product product) {
-        Optional<Product> produtoExistente = productService.getProductById(id);
-        if (produtoExistente.isPresent()) {
-            product.setId(id);
-            Product productAtualizado = productService.updateProduct(product);
-            return ResponseEntity.ok(productAtualizado);
-        }
-        return ResponseEntity.notFound().build();
-    }
 
 
     @DeleteMapping("/delete/{id}")

@@ -1,5 +1,6 @@
 package com.project.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -13,11 +14,11 @@ import org.springframework.format.annotation.NumberFormat;
 import java.util.List;
 
 
-@AllArgsConstructor
-@NoArgsConstructor
+@Entity
 @Getter
 @Setter
-@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,17 +31,16 @@ public class Product {
 
     @ManyToOne
     @JoinColumn(name = "supplier_id", nullable = false)
+    @JsonBackReference
     private Supplier supplier;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
     @NotNull
-    @NumberFormat(pattern = "R$ #,##0.##")
     @Column(nullable = false)
     private float preco;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<Stock> qtdestoque;
+    @NotNull
+    @Column(nullable = false)
+    private int qtdEstoque;
 }
+
+

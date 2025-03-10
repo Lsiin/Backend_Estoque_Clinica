@@ -9,11 +9,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity
 public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +34,11 @@ public class Supplier {
     @Column(nullable = false)
     private String cep;
 
+    @Size(min = 3, message = "Category name must be at least 3 characters long")
+    @Column(nullable = false)
+    private String categoria;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    @OneToMany(mappedBy = "supplier")
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonManagedReference
     private List<Product> products;
 }
