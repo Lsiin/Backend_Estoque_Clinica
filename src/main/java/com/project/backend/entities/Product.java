@@ -34,13 +34,13 @@ public class Product {
     @JsonBackReference
     private Supplier supplier;
 
-    @NotNull
+    @NotNull(message = "The price cannot be null")
     @Column(nullable = false)
-    private float preco;
+    private Float preco;
 
     @NotNull
     @Column(nullable = false)
-    private int qtdEstoque;
+    private Integer qtdEstoque;
 }
 
 

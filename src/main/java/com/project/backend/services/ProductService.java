@@ -20,17 +20,11 @@ public class ProductService {
     private ProductRepository productRepository;
 
 
-    public Product addProduct(Product product) {
-        Product newProduct = productRepository.save(product);
-
-        Stock stock = new Stock();
-        stock.setProduct(product);
-        stock.setQuantidade(0);
-        stock.setTipoMovimento("entrada");
-        stock.setDataMovimento(java.time.LocalDate.now());
-
-        estoqueRepository.save(stock);
-        return newProduct;
+    public Product saveProduct(Product product) {
+        if (product.getPreco() == null || product.getQtdEstoque() == null) {
+            throw new IllegalArgumentException("Preço e Quantidade não podem ser nulos");
+        }
+        return productRepository.save(product);
     }
 
 

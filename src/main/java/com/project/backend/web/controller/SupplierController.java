@@ -20,8 +20,6 @@ public class SupplierController {
 
 
 
-    @Autowired
-    private FornecedorRepository fornecedorRepository;
 
 
     @PostMapping("/register")
