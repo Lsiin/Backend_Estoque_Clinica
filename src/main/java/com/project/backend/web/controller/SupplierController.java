@@ -1,7 +1,6 @@
 package com.project.backend.web.controller;
 
 import com.project.backend.entities.Supplier;
-import com.project.backend.repositories.FornecedorRepository;
 import com.project.backend.services.SupplierServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +23,8 @@ public class SupplierController {
 
     @PostMapping("/register")
     public ResponseEntity<Supplier> cadastrarFornecedor(@RequestBody Supplier supplier) {
-        Supplier supplierSalvo = supplierServices.registerSupplier(supplier);
-        return ResponseEntity.status(HttpStatus.CREATED).body(supplierSalvo);
+        Supplier savedSupplier = supplierServices.registerSupplier(supplier);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedSupplier);
     }
 
 
@@ -33,23 +32,23 @@ public class SupplierController {
 
     @GetMapping
     public ResponseEntity<List<Supplier>> getAllFornecedores() {
-        List<Supplier> fornecedores = supplierServices.getAllFornecedores();
-        return ResponseEntity.ok(fornecedores);
+        List<Supplier> suppliers = supplierServices.getAllFornecedores();
+        return ResponseEntity.ok(suppliers);
     }
 
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Supplier> obterFornecedorPorId(@PathVariable Long id) {
-        Optional<Supplier> fornecedor = supplierServices.getFornecedorById(id);
-        return fornecedor.map(ResponseEntity::ok)
+            Optional<Supplier> supplier = supplierServices.getFornecedorById(id);
+        return supplier.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Supplier> updateFornecedor(@PathVariable Long id, @RequestBody Supplier supplier) {
-        Optional<Supplier> fornecedorExistente = supplierServices.getFornecedorById(id);
-        if (fornecedorExistente.isPresent()) {
+        Optional<Supplier> existSupplier = supplierServices.getFornecedorById(id);
+        if (existSupplier.isPresent()) {
             supplier.setId(id);
             Supplier supplierAtualizado = supplierServices.updateFornecedor(supplier);
             return ResponseEntity.ok(supplierAtualizado);
@@ -61,8 +60,8 @@ public class SupplierController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> excluirFornecedor(@PathVariable Long id) {
-        Optional<Supplier> fornecedorExistente = supplierServices.getFornecedorById(id);
-        if (fornecedorExistente.isPresent()) {
+        Optional<Supplier> existSupplier = supplierServices.getFornecedorById(id);
+        if (existSupplier.isPresent()) {
             supplierServices.deleteFornecedor(id);
             return ResponseEntity.noContent().build();
         } else {

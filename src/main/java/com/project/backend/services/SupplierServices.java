@@ -2,9 +2,8 @@ package com.project.backend.services;
 
 import com.project.backend.entities.Product;
 import com.project.backend.entities.Supplier;
-import com.project.backend.repositories.FornecedorRepository;
+import com.project.backend.repositories.SupplierRepository;
 import com.project.backend.repositories.ProductRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +14,7 @@ import java.util.Optional;
 public class SupplierServices {
 
     @Autowired
-    private FornecedorRepository fornecedorRepository;
+    private SupplierRepository supplierRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -26,23 +25,23 @@ public class SupplierServices {
                 product.setSupplier(supplier);
             }
         }
-        return fornecedorRepository.save(supplier);
+        return supplierRepository.save(supplier);
     }
 
     public List<Supplier> getAllFornecedores() {
-        return fornecedorRepository.findAll();
+        return supplierRepository.findAll();
     }
 
     public Optional<Supplier> getFornecedorById(Long id) {
-        return fornecedorRepository.findById(id);
+        return supplierRepository.findById(id);
     }
 
     public Supplier updateFornecedor(Supplier supplier) {
 
-        return fornecedorRepository.save(supplier);
+        return supplierRepository.save(supplier);
     }
 
     public void deleteFornecedor(Long id) {
-        fornecedorRepository.deleteById(id);
+        supplierRepository.deleteById(id);
     }
 }

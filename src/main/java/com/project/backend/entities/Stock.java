@@ -22,7 +22,7 @@ public class Stock {
     private Product product;
 
     @Column(nullable = false)
-    private int quantidade;
+    private int quantity;
 
     @Column(nullable = false)
     private String tipoMovimento;

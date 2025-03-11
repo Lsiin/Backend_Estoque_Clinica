@@ -9,9 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.format.annotation.NumberFormat;
 
-import java.util.List;
 
 
 @Entity
@@ -36,11 +34,11 @@ public class Product {
 
     @NotNull(message = "The price cannot be null")
     @Column(nullable = false)
-    private Float preco;
+    private Float price;
 
     @NotNull
     @Column(nullable = false)
-    private Integer qtdEstoque;
+    private Integer quantity;
 }
 
 

@@ -10,7 +10,7 @@ import lombok.Setter;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+
 
 @Entity
 @Getter
@@ -28,7 +28,7 @@ public class Supplier {
 
     @Size(min = 2, message = "Name must be at least 2 characters long")
     @Column(nullable = false)
-    private String razaosocial;
+    private String socialname;
 
     @Pattern(regexp = "\\d{5}-\\d{3}", message = "CEP must follow the pattern xxxxx-xxx")
     @Column(nullable = false)
@@ -36,7 +36,7 @@ public class Supplier {
 
     @Size(min = 3, message = "Category name must be at least 3 characters long")
     @Column(nullable = false)
-    private String categoria;
+    private String category;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
