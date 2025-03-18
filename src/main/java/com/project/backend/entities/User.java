@@ -52,6 +52,10 @@ import java.time.LocalDate;
         @Column(nullable = false)
         private String password;
 
+        @Column(nullable = false)
+        @Pattern(regexp = "user|admin", message="User must be informed")
+        private String userType;
+
 
     public void setCpf(String cpf) {
         if (cpf == null) {
