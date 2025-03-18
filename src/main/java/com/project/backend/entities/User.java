@@ -44,6 +44,7 @@ import java.time.LocalDate;
         @Column(nullable = false)
         private String phoneNumber;
 
+        @NotNull(message = "Email cannot be null")
         @Column(nullable = false, unique = true)
         @Email(regexp = ".+@.+\\..+", message = "Email must be valid")
         private String email;
@@ -52,35 +53,11 @@ import java.time.LocalDate;
         @Column(nullable = false)
         private String password;
 
+        @Column(nullable = false)
+        @Pattern(regexp = "user|admin", message="User must be informed")
+        private String userType;
 
-    public void setCpf(String cpf) {
-        if (cpf == null) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCpfFormatException("CPF cannot be null");
-        }
-        if (!cpf.matches("\\d{3}.\\d{3}.\\d{3}-\\d{2}")) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCpfFormatException("CPF is invalid");
-        }
-        this.cpf = cpf;
-    }
-    public void setCep(String cep) {
-        if (cep == null) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCepFormatException("CEP cannot be null");
-        }
-        if (!cep.matches("\\d{5}-\\d{3}")) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCepFormatException("CEP is invalid");
-        }
-        this.cep = cep;
-    }
 
-    public void setPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidPhoneNumberFormatException("Phone number cannot be null");
-        }
-        if (!phoneNumber.matches("^\\+?\\d{0,2} \\(\\d{2}\\) \\d{4,5}-\\d{4}$")) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidPhoneNumberFormatException("Phone number is invalid");
-        }
-        this.phoneNumber = phoneNumber;
-    }
 }
 
 

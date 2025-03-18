@@ -14,7 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -38,41 +42,51 @@ public class UserController {
             })
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Valid User user, BindingResult bindingResult) {
+
         if (bindingResult.hasErrors()) {
-            String errorMessage = Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage();
-            return ResponseEntity.badRequest().body(new ErrorResponses(errorMessage));
+            Map<String, String> errors = new HashMap<>();
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        if (user.getName() == null || user.getName().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ErrorResponses("User name cannot be empty"));
         }
 
         if (user.getCep() == null) {
-            return ResponseEntity.badRequest().body(new ErrorResponses("CEP cannot be null"));
+            throw new GlobalExceptionHandler.InvalidCepFormatException("CEP cannot be null");
         }
 
         if (!isValidEmail(user.getEmail())) {
-            return ResponseEntity.badRequest().body(new ErrorResponses("Invalid email"));
-        }
-        if (!isvalidCpf(user.getCpf())) {
-            return ResponseEntity.badRequest().body(new ErrorResponses("Invalid CPF"));
-        }
-        if (!isValidPhoneNumber(user.getPhoneNumber())) {
-            return ResponseEntity.badRequest().body(new ErrorResponses("Invalid Phone Number"));
-        }
-        if (user.getBirthday() == null) {
-            return ResponseEntity.badRequest().body(new ErrorResponses("Birthday cannot be null"));
+            throw new GlobalExceptionHandler.InvalidEmailFormatException("Invalid Email");
         }
 
+        if (!isvalidCpf(user.getCpf())) {
+            throw new GlobalExceptionHandler.InvalidCpfFormatException("Invalid CPF");
+        }
+
+        if (!isValidPhoneNumber(user.getPhoneNumber())) {
+            throw new GlobalExceptionHandler.InvalidPhoneNumberFormatException("Invalid Phone Number");
+        }
+
+        if (user.getBirthday() == null) {
+            throw new GlobalExceptionHandler.DuplicateDataException("Birthday cannot be null");
+        }
 
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
             throw new GlobalExceptionHandler.DuplicateDataException("A user with this email already exists.");
         }
+
         Optional<User> existingUserByCpf = userRepository.findByCpf(user.getCpf());
         if (existingUserByCpf.isPresent()) {
             throw new GlobalExceptionHandler.DuplicateDataException("A user with this CPF already exists.");
         }
 
-
         User savedUser = userRepository.save(user);
-        return ResponseEntity.ok(savedUser);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
     @Operation(summary = "Find user by id",
             responses = {
