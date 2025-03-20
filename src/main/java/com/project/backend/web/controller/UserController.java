@@ -153,7 +153,7 @@ public class UserController {
             userRepository.deleteById(id);
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found by id: " + id);
+            throw new GlobalExceptionHandler.UserNotFoundException("User not found by id: " + id);
         }
     }
 

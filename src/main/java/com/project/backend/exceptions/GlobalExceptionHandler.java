@@ -44,10 +44,23 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleInvalidCepFormatException(InvalidCepFormatException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(InvalidCnpjFormatException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCnpjFormatException(InvalidCnpjFormatException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Map<String, String>> HandleCategoryNotFoundException(InvalidPhoneNumberFormatException ex) {
+        return handleException(ex, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(InvalidPhoneNumberFormatException.class)
     public ResponseEntity<Map<String, String>> handleInvalidPhoneNumberFormatException(InvalidPhoneNumberFormatException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(SupplierNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleSuplierNotFoundException(SupplierNotFoundException ex) {
+        return handleException(ex, HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -70,12 +83,23 @@ public class GlobalExceptionHandler {
         }
     }
 
+    public static class CategoryNotFoundException extends RuntimeException {
+        public CategoryNotFoundException(String message) {
+            super(message);
+        }
+    }
+
     public static class UserNotFoundException extends RuntimeException {
         public UserNotFoundException(String message) {
             super(message);
         }
     }
 
+    public static class SupplierNotFoundException extends RuntimeException {
+        public SupplierNotFoundException(String message) {
+            super(message);
+        }
+    }
     public static class InvalidCpfFormatException extends RuntimeException {
         public InvalidCpfFormatException(String message) {
             super(message);
@@ -93,4 +117,12 @@ public class GlobalExceptionHandler {
             super(message);
         }
     }
+
+    public static class InvalidCnpjFormatException extends RuntimeException {
+        public InvalidCnpjFormatException(String message) {
+            super(message);
+        }
+    }
+
+
 }
