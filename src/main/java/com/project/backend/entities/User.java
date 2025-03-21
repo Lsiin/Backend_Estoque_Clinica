@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "users") // nome da tabela no banco
+@Table(name = "users")
 public class User {
 
     @Id
@@ -56,25 +56,5 @@ public class User {
     @Pattern(regexp = "user|admin", message = "User type must be 'user' or 'admin'")
     private String userType;
 
-    // Validadores com exceções personalizadas
-    public void setCpf(String cpf) {
-        if (cpf == null) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCpfFormatException("CPF cannot be null");
-        }
-        if (!cpf.matches("\\d{3}.\\d{3}.\\d{3}-\\d{2}")) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCpfFormatException("CPF is invalid");
-        }
-        this.cpf = cpf;
-    }
 
-
-    public void setPhoneNumber(String phoneNumber) {
-        if (phoneNumber == null) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidPhoneNumberFormatException("Phone number cannot be null");
-        }
-        if (!phoneNumber.matches("^\\+?\\d{0,2} \\(\\d{2}\\) \\d{4,5}-\\d{4}$")) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidPhoneNumberFormatException("Phone number is invalid");
-        }
-        this.phoneNumber = phoneNumber;
-    }
 }

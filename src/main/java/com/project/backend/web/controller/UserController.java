@@ -32,7 +32,7 @@ public class UserController {
         return ResponseEntity.ok("Working");
     }
 
-    // 🔓 Rota pública para criação de usuário (sem autenticação)
+    // 🔓 Rota pública para criação de usuario (sem autenticação)
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Valid User user, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
