@@ -10,53 +10,57 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-    @Getter
-    @Setter
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Entity
-    public class User {
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Entity
+@Table(name = "users") // nome da tabela no banco
+public class User {
 
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-        @NotNull(message = "Name cannot be null")
-        @Column(nullable = false)
-        @Size(min = 3, message = "Name must be at least 3 characters long")
-        private String name;
+    @NotNull(message = "Name cannot be null")
+    @Column(nullable = false)
+    @Size(min = 3, message = "Name must be at least 3 characters long")
+    private String name;
 
-        @Pattern(regexp = "\\d{3}.\\d{3}.\\d{3}-\\d{2}",message = "CPF must follow the pattern xxx.xxx.xxx-xx")
-        @Column(nullable = false,unique = true)
-        private String cpf;
+    @Pattern(regexp = "\\d{3}.\\d{3}.\\d{3}-\\d{2}", message = "CPF must follow the pattern xxx.xxx.xxx-xx")
+    @Column(nullable = false, unique = true)
+    private String cpf;
 
-        @NotNull(message = "Birthdate cannot be empty")
-        @Column(nullable = false)
-        private LocalDate birthday;
+    @NotNull(message = "Birthdate cannot be empty")
+    @Column(nullable = false)
+    private LocalDate birthday;
 
-        @NotNull(message = "Cep cannot be null")
-        @Pattern(regexp = "\\d{5}-\\d{3}", message = "CEP must follow the pattern xxxxx-xxx")
-        @Column(nullable = false)
-        private String cep;
+    @NotNull(message = "Cep cannot be null")
+    @Pattern(regexp = "\\d{5}-\\d{3}", message = "CEP must follow the pattern xxxxx-xxx")
+    @Column(nullable = false)
+    private String cep;
 
-        @Pattern(regexp="\"^\\\\+?\\\\d{0,2} \\\\(\\\\d{2}\\\\) \\\\d{4,5}-\\\\d{4}$\"", message = "The number is incorrect pattern ")
-        @NotBlank(message=" Phone number is required")
-        @Column(nullable = false)
-        private String phoneNumber;
+    @Pattern(
+            regexp = "^\\+?\\d{0,2} \\(\\d{2}\\) \\d{4,5}-\\d{4}$",
+            message = "The number must follow the pattern +XX (XX) XXXX-XXXX"
+    )
+    @NotBlank(message = "Phone number is required")
+    @Column(nullable = false)
+    private String phoneNumber;
 
-        @Column(nullable = false, unique = true)
-        @Email(regexp = ".+@.+\\..+", message = "Email must be valid")
-        private String email;
+    @Column(nullable = false, unique = true)
+    @Email(regexp = ".+@.+\\..+", message = "Email must be valid")
+    private String email;
 
-        @NotBlank(message = "Password is required")
-        @Column(nullable = false)
-        private String password;
+    @NotBlank(message = "Password is required")
+    @Column(nullable = false)
+    private String password;
 
-        @Column(nullable = false)
-        @Pattern(regexp = "user|admin", message="User must be informed")
-        private String userType;
+    @Column(nullable = false)
+    @Pattern(regexp = "user|admin", message = "User type must be 'user' or 'admin'")
+    private String userType;
 
-
+    // Validadores com exceções personalizadas
     public void setCpf(String cpf) {
         if (cpf == null) {
             throw new GlobalExceptionHandler.UserNotFoundException.InvalidCpfFormatException("CPF cannot be null");
@@ -66,6 +70,7 @@ import java.time.LocalDate;
         }
         this.cpf = cpf;
     }
+
     public void setCep(String cep) {
         if (cep == null) {
             throw new GlobalExceptionHandler.UserNotFoundException.InvalidCepFormatException("CEP cannot be null");
@@ -86,6 +91,3 @@ import java.time.LocalDate;
         this.phoneNumber = phoneNumber;
     }
 }
-
-
-
