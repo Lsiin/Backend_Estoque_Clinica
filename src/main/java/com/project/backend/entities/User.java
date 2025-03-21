@@ -35,10 +35,6 @@ public class User {
     @Column(nullable = false)
     private LocalDate birthday;
 
-    @NotNull(message = "Cep cannot be null")
-    @Pattern(regexp = "\\d{5}-\\d{3}", message = "CEP must follow the pattern xxxxx-xxx")
-    @Column(nullable = false)
-    private String cep;
 
     @Pattern(
             regexp = "^\\+?\\d{0,2} \\(\\d{2}\\) \\d{4,5}-\\d{4}$",
@@ -71,15 +67,6 @@ public class User {
         this.cpf = cpf;
     }
 
-    public void setCep(String cep) {
-        if (cep == null) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCepFormatException("CEP cannot be null");
-        }
-        if (!cep.matches("\\d{5}-\\d{3}")) {
-            throw new GlobalExceptionHandler.UserNotFoundException.InvalidCepFormatException("CEP is invalid");
-        }
-        this.cep = cep;
-    }
 
     public void setPhoneNumber(String phoneNumber) {
         if (phoneNumber == null) {

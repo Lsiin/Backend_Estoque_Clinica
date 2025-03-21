@@ -40,9 +40,6 @@ public class UserController {
             return ResponseEntity.badRequest().body(new ErrorResponses(errorMessage));
         }
 
-        if (user.getCep() == null) {
-            return ResponseEntity.badRequest().body(new ErrorResponses("CEP cannot be null"));
-        }
 
         if (!isValidEmail(user.getEmail())) {
             return ResponseEntity.badRequest().body(new ErrorResponses("Invalid email"));
@@ -101,7 +98,6 @@ public class UserController {
                     existingUser.setName(userDetails.getName());
                     existingUser.setBirthday(userDetails.getBirthday());
                     existingUser.setPhoneNumber(userDetails.getPhoneNumber());
-                    existingUser.setCep(userDetails.getCep());
                     existingUser.setEmail(userDetails.getEmail());
 
                     // Atualiza senha criptografada
