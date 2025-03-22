@@ -93,6 +93,7 @@ public class GlobalExceptionHandler {
         public UserNotFoundException(String message) {
             super(message);
         }
+
     }
 
     public static class SupplierNotFoundException extends RuntimeException {
@@ -115,6 +116,7 @@ public class GlobalExceptionHandler {
     public static class InvalidPhoneNumberFormatException extends RuntimeException {
         public InvalidPhoneNumberFormatException(String message) {
             super(message);
+
         }
     }
 

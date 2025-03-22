@@ -10,4 +10,3 @@ public class ErrorResponses {
         this.message = message;
     }
 }
-
