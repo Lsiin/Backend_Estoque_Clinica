@@ -73,16 +73,11 @@ public class UserController {
         }
 
 
-        if (user.getCep() == null) {
-            throw new GlobalExceptionHandler.InvalidCepFormatException("CEP cannot be null");
-        }
-
-
         if (!isValidEmail(user.getEmail())) {
             throw new GlobalExceptionHandler.InvalidEmailFormatException("Invalid Email");
         }
 
-        if (!isvalidCpf(user.getCpf())) {
+        if (!isValidCpf(user.getCpf())) {
             throw new GlobalExceptionHandler.InvalidCpfFormatException("Invalid CPF");
 
         }
@@ -184,16 +179,7 @@ public class UserController {
                             content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class))),
             })
 
-    // 🔐 Requer token com papel ADMIN
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/all")
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        if (users.isEmpty()) {
-            throw new GlobalExceptionHandler.UserNotFoundException("Nenhum usuário encontrado");
-        }
-        return ResponseEntity.ok(users);
-    }
+
 
     // 🔐 Requer token com papel ADMIN
     @PreAuthorize("hasRole('ADMIN')")
