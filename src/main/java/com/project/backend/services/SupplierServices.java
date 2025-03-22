@@ -3,7 +3,6 @@ package com.project.backend.services;
 import com.project.backend.entities.Product;
 import com.project.backend.entities.Supplier;
 import com.project.backend.repositories.SupplierRepository;
-import com.project.backend.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,8 +15,6 @@ public class SupplierServices {
     @Autowired
     private SupplierRepository supplierRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
 
     public Supplier registerSupplier(Supplier supplier) {
         if (supplier.getProducts() != null) {

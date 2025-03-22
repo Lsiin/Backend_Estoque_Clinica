@@ -44,17 +44,20 @@ public class User {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Column(nullable = false, unique = true)
-    @Email(regexp = ".+@.+\\..+", message = "Email must be valid")
-    private String email;
+
+        @NotNull(message = "Email cannot be null")
+        @Column(nullable = false, unique = true)
+        @Email(regexp = ".+@.+\\..+", message = "Email must be valid")
+        private String email;
+
 
     @NotBlank(message = "Password is required")
     @Column(nullable = false)
     private String password;
 
+
     @Column(nullable = false)
     @Pattern(regexp = "user|admin", message = "User type must be 'user' or 'admin'")
     private String userType;
-
 
 }
