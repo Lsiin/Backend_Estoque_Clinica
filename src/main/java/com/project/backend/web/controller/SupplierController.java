@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("suppliers")
+@RequestMapping("/suppliers")
 public class SupplierController {
 
     @Autowired

@@ -34,9 +34,10 @@ public class Supplier {
     @Column(nullable = false)
     private String cep;
 
-    @Size(min = 3, message = "Category name must be at least 3 characters long")
-    @Column(nullable = false)
-    private String category;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonManagedReference
