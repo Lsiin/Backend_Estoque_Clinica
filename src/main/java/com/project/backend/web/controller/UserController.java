@@ -56,7 +56,7 @@ public class UserController {
     }
 
 
-
+    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Valid User user, BindingResult bindingResult) {
 
