@@ -31,9 +31,9 @@ public class User {
     @Column(nullable = false, unique = true)
     private String cpf;
 
-    @NotNull(message = "Birthdate cannot be empty")
+   /* @NotNull(message = "Birthdate cannot be empty")
     @Column(nullable = false)
-    private LocalDate birthday;
+    private LocalDate birthday;*/
 
 
     @Pattern(
