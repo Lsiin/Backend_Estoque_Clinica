@@ -27,10 +27,17 @@ public class Product {
     @Size(min = 3, message = "Name must be at least 3 characters long")
     private String name;
 
+
+
     @ManyToOne
     @JoinColumn(name = "supplier_id", nullable = false)
     @JsonBackReference
     private Supplier supplier;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
 
     @NotNull(message = "The price cannot be null")
     @Column(nullable = false)
