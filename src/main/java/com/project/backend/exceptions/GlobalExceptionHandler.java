@@ -49,6 +49,7 @@ public class GlobalExceptionHandler {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
 
+
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<Map<String, String>> HandleCategoryNotFoundException(InvalidPhoneNumberFormatException ex) {
         return handleException(ex, HttpStatus.NOT_FOUND);
@@ -70,6 +71,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+    @ExceptionHandler(StockNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleStockNotFoundException(StockNotFoundException ex) {
+        return handleException(ex, HttpStatus.NOT_FOUND);
+    }
 
     public static class InvalidEmailFormatException extends RuntimeException {
         public InvalidEmailFormatException(String message) {
@@ -126,5 +131,10 @@ public class GlobalExceptionHandler {
         }
     }
 
+    public static class StockNotFoundException extends RuntimeException {
+        public StockNotFoundException(String message) {
+            super(message);
+        }
+    }
 
 }

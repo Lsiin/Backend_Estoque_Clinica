@@ -1,8 +1,10 @@
 package com.project.backend.web.controller;
 
+import com.project.backend.entities.Product;
 import com.project.backend.entities.User;
 import com.project.backend.exceptions.GlobalExceptionHandler;
 import com.project.backend.repositories.UserRepository;
+import com.project.backend.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,10 +21,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 
 @Tag(name = "user", description = "Contains any registers, searches, updates and deletes, of the users ")
@@ -35,6 +34,8 @@ public class UserController {
     private UserRepository userRepository;
      @Autowired
     private PasswordEncoder passwordEncoder;
+     @Autowired
+     private UserService userService;
   
 
     @Operation(summary = "Register a user",
@@ -53,6 +54,12 @@ public class UserController {
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Working");
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users= userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     // 🔓 Rota pública para criação de usuario (sem autenticação)
@@ -195,7 +202,7 @@ public class UserController {
         }
     }
 
-    // 📌 Validações auxiliares
+
 
     private boolean isValidEmail(String email) {
         return email.matches(".+@.+\\..+");
