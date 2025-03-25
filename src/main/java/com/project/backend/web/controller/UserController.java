@@ -56,7 +56,7 @@ public class UserController {
     }
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
+
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Valid User user, BindingResult bindingResult) {
 
@@ -86,9 +86,9 @@ public class UserController {
             throw new GlobalExceptionHandler.InvalidPhoneNumberFormatException("Invalid Phone Number");
         }
 
-        /*if (user.getBirthday() == null) {
+        if (user.getBirthday() == null) {
             throw new GlobalExceptionHandler.DuplicateDataException("Birthday cannot be null");
-        }*/
+        }
 
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
         if (existingUser.isPresent()) {
