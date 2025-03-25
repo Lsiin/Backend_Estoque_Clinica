@@ -34,12 +34,21 @@ public class JwtFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // Rotas públicas que não requerem autenticação
+        if (path.startsWith("/auth/") || path.equals("/user/create")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // Restante da lógica original do filtro...
         final String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            jwt = authHeader.substring(7); // remove "Bearer "
+            jwt = authHeader.substring(7);
             try {
                 username = jwtUtil.extractUsername(jwt);
             } catch (ExpiredJwtException e) {
@@ -50,8 +59,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            // 🔐 Verifica se o token está na blacklist
             if (tokenBlacklist.isBlacklisted(jwt)) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
