@@ -50,7 +50,7 @@ public class UserController {
 
    
 
-    // 🔓 Rota pública para teste
+
     @GetMapping("/test")
     public ResponseEntity<String> testEndpoint() {
         return ResponseEntity.ok("Working");
@@ -62,7 +62,7 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    // 🔓 Rota pública para criação de usuario (sem autenticação)
+
 
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Valid User user, BindingResult bindingResult) {
@@ -108,7 +108,7 @@ public class UserController {
         }
 
 
-        // 🔐 Criptografar senha antes de salvar
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         User savedUser = userRepository.save(user);
@@ -126,7 +126,7 @@ public class UserController {
             })
 
 
-    // 🔐 Requer token com papel USER ou ADMIN
+
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/get/{id}")
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
@@ -151,7 +151,7 @@ public class UserController {
                             content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class))),
             })
 
-    // 🔐 Requer token com papel USER ou ADMIN
+
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
 
     @PutMapping("/update/{id}")
@@ -162,11 +162,11 @@ public class UserController {
                         existingUser.setCpf(userDetails.getCpf());
                     }
                     existingUser.setName(userDetails.getName());
-                    existingUser.setBirthday(userDetails.getBirthday());
+                    /*existingUser.setBirthday(userDetails.getBirthday());*/
                     existingUser.setPhoneNumber(userDetails.getPhoneNumber());
                     existingUser.setEmail(userDetails.getEmail());
 
-                    // Atualiza senha criptografada
+
                     existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
 
                     User updateUser = userRepository.save(existingUser);
@@ -188,7 +188,7 @@ public class UserController {
 
 
 
-    // 🔐 Requer token com papel ADMIN
+
     @PreAuthorize("hasRole('ADMIN')")
 
     @DeleteMapping("/delete/{id}")
