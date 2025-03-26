@@ -37,8 +37,8 @@ public class User {
 
 
     @Pattern(
-            regexp = "^\\+?\\d{0,2} \\(\\d{2}\\) \\d{4,5}-\\d{4}$",
-            message = "The number must follow the pattern +XX (XX) XXXX-XXXX"
+            regexp = " \\(\\d{2}\\) \\d{4,5}-\\d{4}$",
+            message = "The number must follow the pattern (XX) XXXX-XXXX"
     )
     @NotBlank(message = "Phone number is required")
     @Column(nullable = false)
