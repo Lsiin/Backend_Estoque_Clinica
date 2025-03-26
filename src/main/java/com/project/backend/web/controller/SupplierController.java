@@ -25,8 +25,6 @@ public class SupplierController {
     @Autowired
     private SupplierRepository supplierRepository;
 
-
-
     @Operation(summary = "Register a supplier",
             responses = {
                     @ApiResponse(responseCode = "201", description = "Supplier registration successfully",
@@ -67,18 +65,21 @@ public class SupplierController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSupplier);
     }
 
-
-
-
+    @Operation(summary = "Get all suppliers",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "List of all suppliers",
+                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = Supplier.class))),
+                    @ApiResponse(responseCode = "404", description = "No suppliers found",
+                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class)))
+            })
     @GetMapping
     public ResponseEntity<List<Supplier>> getAllFornecedores() {
         List<Supplier> suppliers = supplierServices.getAllFornecedores();
         if(suppliers.isEmpty()) {
-            throw new GlobalExceptionHandler.UserNotFoundException("Supliers not found");
+            throw new GlobalExceptionHandler.UserNotFoundException("Suppliers not found");
         }
         return ResponseEntity.ok(suppliers);
     }
-
 
     @Operation(summary = "Find supplier by ID",
             responses = {
@@ -89,10 +90,10 @@ public class SupplierController {
             })
     @GetMapping("/get/{id}")
     public ResponseEntity<Supplier> obterFornecedorPorId(@PathVariable Long id) {
-            Optional<Supplier> supplier = supplierServices.getFornecedorById(id);
+        Optional<Supplier> supplier = supplierServices.getFornecedorById(id);
         if (supplier.isPresent()) {
             return ResponseEntity.ok(supplier.get());
-        }else {
+        } else {
             throw new GlobalExceptionHandler.SupplierNotFoundException("Supplier not found with ID:" + id);
         }
     }
@@ -118,7 +119,8 @@ public class SupplierController {
 
     @Operation(summary = "Delete a supplier",
             responses = {
-                    @ApiResponse(responseCode = "204", description = "Supplier deleted successfully"),
+                    @ApiResponse(responseCode = "201", description = "Supplier deleted successfully",
+                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = Supplier.class))),
                     @ApiResponse(responseCode = "404", description = "Supplier not found",
                             content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class)))
             })
@@ -132,7 +134,8 @@ public class SupplierController {
             return ResponseEntity.notFound().build();
         }
     }
+
     private boolean isValidCnpj(String cnpj) {
-       return cnpj.matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
+        return cnpj.matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
     }
 }

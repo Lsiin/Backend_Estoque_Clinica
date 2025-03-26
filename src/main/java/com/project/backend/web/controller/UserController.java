@@ -162,7 +162,7 @@ public class UserController {
                         existingUser.setCpf(userDetails.getCpf());
                     }
                     existingUser.setName(userDetails.getName());
-                    /*existingUser.setBirthday(userDetails.getBirthday());*/
+                    existingUser.setBirthday(userDetails.getBirthday());
                     existingUser.setPhoneNumber(userDetails.getPhoneNumber());
                     existingUser.setEmail(userDetails.getEmail());
 
