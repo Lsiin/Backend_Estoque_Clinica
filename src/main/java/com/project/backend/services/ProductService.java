@@ -5,10 +5,12 @@ import com.project.backend.entities.Category;
 import com.project.backend.entities.Product;
 import com.project.backend.entities.Stock;
 import com.project.backend.entities.Supplier;
+import com.project.backend.exceptions.GlobalExceptionHandler;
 import com.project.backend.repositories.CategoryRepository;
 import com.project.backend.repositories.ProductRepository;
 import com.project.backend.repositories.StockRepository;
 import com.project.backend.repositories.SupplierRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable_;
 import org.springframework.stereotype.Service;
@@ -64,7 +66,26 @@ public class ProductService {
 
 
 
+    @Transactional
+    public Product updateProduct(Long id, ProductDTO productDTO) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Product not found"));
 
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+        product.setDataCompra(productDTO.getDataCompra());
+        product.setDataValidade(productDTO.getDataValidade());
+
+        if (productDTO.getSupplierId() != null) {
+            Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
+                    .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Supplier not found"));
+            product.setSupplier(supplier);
+        }
+
+
+        return product;
+    }
 
 
     public List<Product> getAllProducts() {
