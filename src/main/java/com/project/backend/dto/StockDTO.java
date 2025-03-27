@@ -1,9 +1,11 @@
 package com.project.backend.dto;
 
 import com.project.backend.entities.Stock;
+import lombok.Data;
 
 import java.time.LocalDate;
 
+@Data
 public class StockDTO {
     private Long id;
     private String productName;

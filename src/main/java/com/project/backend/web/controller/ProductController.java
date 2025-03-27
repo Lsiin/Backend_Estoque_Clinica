@@ -1,5 +1,6 @@
 package com.project.backend.web.controller;
 
+import com.project.backend.dto.ProductDTO;
 import com.project.backend.entities.Product;
 import com.project.backend.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -55,8 +56,8 @@ public class ProductController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
             })
     @PostMapping("/register")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product newProduct = productService.saveProduct(product);
+    public ResponseEntity<Product> createProduct(@RequestBody ProductDTO productDTO) {
+        Product newProduct = productService.saveProduct(productDTO);
         return ResponseEntity.status(201).body(newProduct);
     }
 
