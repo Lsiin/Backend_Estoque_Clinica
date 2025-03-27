@@ -1,9 +1,9 @@
 package com.project.backend.services;
 
 import com.project.backend.entities.Product;
-import com.project.backend.repositories.StockRepository;
 import com.project.backend.repositories.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.AbstractPersistable_;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,8 +12,6 @@ import java.util.Optional;
 @Service
 public class ProductService {
 
-    @Autowired
-    private StockRepository stockRepository;
 
     @Autowired
     private ProductRepository productRepository;
@@ -41,13 +39,24 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-
-    public Product updateProduct(Product product) {
-        return productRepository.save(product);
+    public Optional<Product> updateProduct(Long id, Product productDetails) {
+        return productRepository.findById(id).map(product -> {
+            product.setName(productDetails.getName());
+            product.setPrice(productDetails.getPrice());
+            product.setQuantity(productDetails.getQuantity());
+            product.setCategory(productDetails.getCategory());
+            product.setSupplier(productDetails.getSupplier());
+            return productRepository.save(product);
+        });
     }
 
 
-    public void deleteProduct(long id) {
-        productRepository.deleteById(id);
+    public boolean deleteProduct(Long id) {
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+            return true;
+        }
+        return false;
     }
+
 }

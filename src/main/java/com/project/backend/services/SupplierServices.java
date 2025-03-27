@@ -1,6 +1,5 @@
 package com.project.backend.services;
 
-import com.project.backend.entities.Product;
 import com.project.backend.entities.Supplier;
 import com.project.backend.repositories.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +14,7 @@ public class SupplierServices {
     @Autowired
     private SupplierRepository supplierRepository;
 
-
     public Supplier registerSupplier(Supplier supplier) {
-        if (supplier.getProducts() != null) {
-            for (Product product : supplier.getProducts()) {
-                product.setSupplier(supplier);
-            }
-        }
         return supplierRepository.save(supplier);
     }
 
@@ -34,7 +27,6 @@ public class SupplierServices {
     }
 
     public Supplier updateFornecedor(Supplier supplier) {
-
         return supplierRepository.save(supplier);
     }
 

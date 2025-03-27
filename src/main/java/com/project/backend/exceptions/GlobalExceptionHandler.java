@@ -59,6 +59,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleInvalidPhoneNumberFormatException(InvalidPhoneNumberFormatException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(EnumIncorretException.class)
+    public ResponseEntity<Map<String, String>> handleEnumIncorretException(EnumIncorretException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
     @ExceptionHandler(SupplierNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleSuplierNotFoundException(SupplierNotFoundException ex) {
         return handleException(ex, HttpStatus.NOT_FOUND);
@@ -99,6 +103,11 @@ public class GlobalExceptionHandler {
             super(message);
         }
 
+    }
+    public static class EnumIncorretException extends RuntimeException {
+        public EnumIncorretException(String message) {
+            super(message);
+        }
     }
 
     public static class SupplierNotFoundException extends RuntimeException {

@@ -1,7 +1,6 @@
 package com.project.backend.services;
 
 
-import com.project.backend.entities.Product;
 import com.project.backend.entities.User;
 import com.project.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

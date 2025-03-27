@@ -36,7 +36,7 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
      @Autowired
      private UserService userService;
-  
+
 
     @Operation(summary = "Register a user",
             responses = {
@@ -48,7 +48,7 @@ public class UserController {
                             content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class))),
             })
 
-   
+
 
 
     @GetMapping("/test")
@@ -79,14 +79,12 @@ public class UserController {
             return ResponseEntity.badRequest().body(new ErrorResponses("User name cannot be empty"));
         }
 
-
         if (!isValidEmail(user.getEmail())) {
             throw new GlobalExceptionHandler.InvalidEmailFormatException("Invalid Email");
         }
 
         if (!isValidCpf(user.getCpf())) {
             throw new GlobalExceptionHandler.InvalidCpfFormatException("Invalid CPF");
-
         }
 
         if (!isValidPhoneNumber(user.getPhoneNumber())) {
@@ -95,6 +93,13 @@ public class UserController {
 
         if (user.getBirthday() == null) {
             throw new GlobalExceptionHandler.DuplicateDataException("Birthday cannot be null");
+        }
+
+
+        try {
+            User.UserType.valueOf(user.getUserType().name());
+        } catch (IllegalArgumentException e) {
+            throw new GlobalExceptionHandler.EnumIncorretException("Invalid UserType: " + user.getUserType());
         }
 
         Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
@@ -106,8 +111,6 @@ public class UserController {
         if (existingUserByCpf.isPresent()) {
             throw new GlobalExceptionHandler.DuplicateDataException("A user with this CPF already exists.");
         }
-
-
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
@@ -162,7 +165,7 @@ public class UserController {
                         existingUser.setCpf(userDetails.getCpf());
                     }
                     existingUser.setName(userDetails.getName());
-                    /*existingUser.setBirthday(userDetails.getBirthday());*/
+                    existingUser.setBirthday(userDetails.getBirthday());
                     existingUser.setPhoneNumber(userDetails.getPhoneNumber());
                     existingUser.setEmail(userDetails.getEmail());
 
