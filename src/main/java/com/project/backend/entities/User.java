@@ -57,7 +57,10 @@ public class User {
 
 
     @Column(nullable = false)
-    @Pattern(regexp = "user|admin", message = "User type must be 'user' or 'admin'")
-    private String userType;
+    private UserType userType;
 
+
+    public enum UserType {
+        USER, ADMIN
+    }
 }
