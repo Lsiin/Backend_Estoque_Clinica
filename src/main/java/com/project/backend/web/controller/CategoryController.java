@@ -56,7 +56,7 @@ public class CategoryController {
                     @ApiResponse(responseCode = "404", description = "Category not found",
                             content = @Content(mediaType = "application/json"))
             })
-    @GetMapping("/{id}")
+    @GetMapping("/get/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
         return categoryService.getCategoryById(id)
                 .map(ResponseEntity::ok)
@@ -72,7 +72,7 @@ public class CategoryController {
                     @ApiResponse(responseCode = "400", description = "Invalid request",
                             content = @Content(mediaType = "application/json"))
             })
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
         return categoryService.updateCategory(id, category)
                 .map(ResponseEntity::ok)
@@ -86,7 +86,7 @@ public class CategoryController {
                     @ApiResponse(responseCode = "404", description = "Category not found",
                             content = @Content(mediaType = "application/json"))
             })
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         if (categoryService.deleteCategory(id)) {
             return ResponseEntity.noContent().build();
