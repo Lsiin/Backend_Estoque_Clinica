@@ -1,15 +1,18 @@
 package com.project.backend.dto;
 
-
-import lombok.*;
+import com.project.backend.entities.Product;
+import lombok.Data;
+import java.time.LocalDate;
 
 @Data
 public class ProductDTO {
+    private Long id;
     private String name;
-    private Float price;
-    private Integer quantity;
     private Long supplierId;
     private Long categoryId;
-
+    private Float price;
+    private Integer quantity;
+    private LocalDate dataCompra;
+    private LocalDate dataValidade;
 
 }

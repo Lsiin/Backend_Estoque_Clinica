@@ -33,16 +33,22 @@ public class ProductService {
 
     public Product saveProduct(ProductDTO productDTO) {
 
+
         Product product = new Product();
         product.setName(productDTO.getName());
         product.setPrice(productDTO.getPrice());
         product.setQuantity(productDTO.getQuantity());
+        product.setDataCompra(productDTO.getDataCompra());
+        product.setDataValidade(productDTO.getDataValidade());
 
 
         Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
                 .orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
+
+
         Category category = categoryRepository.findById(productDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
 
         product.setSupplier(supplier);
         product.setCategory(category);
@@ -55,6 +61,8 @@ public class ProductService {
 
         return savedProduct;
     }
+
+
 
 
 

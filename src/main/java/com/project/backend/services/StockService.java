@@ -12,9 +12,9 @@ import java.time.LocalDate;
 @Service
 public class StockService {
 
-    @Autowired
-    private StockRepository stockRepository;
+    private final StockRepository stockRepository;
 
+    @Autowired
     public StockService(StockRepository stockRepository) {
         this.stockRepository = stockRepository;
     }
@@ -23,9 +23,12 @@ public class StockService {
     public void RegisterStockEntry(Product product) {
         Stock stock = new Stock();
         stock.setProduct(product);
+        stock.setSupplier(product.getSupplier());
         stock.setQuantity(product.getQuantity());
         stock.setTipoMovimento("Entrada");
         stock.setDataMovimento(LocalDate.now());
+        stock.setQtdComprada(product.getQuantity());
+
         stockRepository.save(stock);
     }
 }
