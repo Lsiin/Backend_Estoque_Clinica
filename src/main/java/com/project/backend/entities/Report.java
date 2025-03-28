@@ -1,7 +1,6 @@
 package com.project.backend.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,24 +13,39 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Report {
+
+    public enum ReportType {
+        STOCK, PURCHASE, EXPIRATION
+    }
+
+    public enum Format {
+        PDF, EXCEL, CSV
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Pattern(regexp = " STOCK|PURCHASE|EXPIRATION")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String reportType;
+    private ReportType reportType;
 
     @Column(nullable = false)
     private LocalDateTime generationDate;
 
-    @Pattern(regexp = " PDF|EXCEL|CSV")
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String format;
+    private Format format;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "LONGBLOB")
     private byte[] content;
+
+    @Column(nullable = false)
+    private String filename;
+
+    @Column(nullable = false)
+    private Long fileSize;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

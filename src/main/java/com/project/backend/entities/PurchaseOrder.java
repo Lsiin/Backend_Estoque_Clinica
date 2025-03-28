@@ -23,6 +23,10 @@ public class PurchaseOrder {
     @JoinColumn(name = "supplier_id", nullable = false)
     private Supplier supplier;
 
+
+    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
+    private List<PurchaseItem> items;
+
     @Column(nullable = false)
     private LocalDate orderDate;
 
@@ -33,8 +37,7 @@ public class PurchaseOrder {
     @Column(nullable = false)
     private String status;
 
-    @OneToMany(mappedBy = "purchaseOrder", cascade = CascadeType.ALL)
-    private List<PurchaseItem> items;
+
 }
 
 
