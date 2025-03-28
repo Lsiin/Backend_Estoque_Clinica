@@ -10,15 +10,18 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.*;
@@ -154,26 +157,72 @@ public class UserController {
                             content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class))),
             })
 
-
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-
+    @Transactional
     @PutMapping("/update/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id,
+                                        @RequestBody @Valid User userDetails,
+                                        BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errors.put(error.getField(), error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body(errors);
+        }
+
         return userRepository.findById(id)
                 .map(existingUser -> {
-                    if (existingUser.getCpf() != null) {
-                        existingUser.setCpf(userDetails.getCpf());
+
+                    boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                            .getAuthorities().stream()
+                            .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+
+                    boolean isSelf = existingUser.getEmail().equals(
+                            SecurityContextHolder.getContext().getAuthentication().getName());
+
+                    if (!isAdmin && !isSelf) {
+                        throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                                "You can only update your own profile");
                     }
+
+
+                    if (!existingUser.getEmail().equals(userDetails.getEmail())) {
+                        userRepository.findByEmail(userDetails.getEmail())
+                                .ifPresent(u -> {
+                                    throw new GlobalExceptionHandler.DuplicateDataException("Email already in use");
+                                });
+                    }
+
+                    if (!existingUser.getCpf().equals(userDetails.getCpf())) {
+                        userRepository.findByCpf(userDetails.getCpf())
+                                .ifPresent(u -> {
+                                    throw new GlobalExceptionHandler.DuplicateDataException("CPF already in use");
+                                });
+                    }
+
+
                     existingUser.setName(userDetails.getName());
+                    existingUser.setCpf(userDetails.getCpf());
                     existingUser.setBirthday(userDetails.getBirthday());
                     existingUser.setPhoneNumber(userDetails.getPhoneNumber());
                     existingUser.setEmail(userDetails.getEmail());
+                    existingUser.setPassword(userDetails.getPassword());
+                    existingUser.setUserType(userDetails.getUserType());
+                    userRepository.save(existingUser);
 
+                    if (!existingUser.getEmail().equals(userDetails.getEmail())) {
+                        existingUser.setEmail(userDetails.getEmail());
+                    }
 
-                    existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+                    if (userDetails.getPassword() != null && !userDetails.getPassword().isEmpty()) {
+                        existingUser.setPassword(passwordEncoder.encode(userDetails.getPassword()));
+                    }
 
-                    User updateUser = userRepository.save(existingUser);
-                    return ResponseEntity.ok(updateUser);
+                    if (isAdmin) {
+                        existingUser.setUserType(userDetails.getUserType());
+                    }
+
+                    return ResponseEntity.ok(userRepository.save(existingUser));
                 })
                 .orElse(ResponseEntity.notFound().build());
     }

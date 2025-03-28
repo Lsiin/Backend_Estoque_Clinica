@@ -1,7 +1,16 @@
 package com.project.backend.services;
 
+import com.project.backend.dto.ProductDTO;
+import com.project.backend.entities.Category;
 import com.project.backend.entities.Product;
+import com.project.backend.entities.Stock;
+import com.project.backend.entities.Supplier;
+import com.project.backend.exceptions.GlobalExceptionHandler;
+import com.project.backend.repositories.CategoryRepository;
 import com.project.backend.repositories.ProductRepository;
+import com.project.backend.repositories.StockRepository;
+import com.project.backend.repositories.SupplierRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable_;
 import org.springframework.stereotype.Service;
@@ -16,17 +25,66 @@ public class ProductService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private StockService stockService;
+    @Autowired
+    private SupplierRepository supplierRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    public Product saveProduct(Product product) {
-        if (product.getPrice() == null || product.getQuantity() == null) {
-            throw new IllegalArgumentException("Preço e Quantidade não podem ser nulos");
-        }
-        return productRepository.save(product);
+
+    public Product saveProduct(ProductDTO productDTO) {
+
+
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+        product.setDataCompra(productDTO.getDataCompra());
+        product.setDataValidade(productDTO.getDataValidade());
+
+
+        Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
+                .orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
+
+
+        Category category = categoryRepository.findById(productDTO.getCategoryId())
+                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+
+
+        product.setSupplier(supplier);
+        product.setCategory(category);
+
+
+        Product savedProduct = productRepository.save(product);
+
+
+        stockService.RegisterStockEntry(savedProduct);
+
+        return savedProduct;
     }
 
 
-    public Product registerProduct(Product product) {
-        return productRepository.save(product);
+
+    @Transactional
+    public Product updateProduct(Long id, ProductDTO productDTO) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Product not found"));
+
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+        product.setDataCompra(productDTO.getDataCompra());
+        product.setDataValidade(productDTO.getDataValidade());
+
+        if (productDTO.getSupplierId() != null) {
+            Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
+                    .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Supplier not found"));
+            product.setSupplier(supplier);
+        }
+
+
+        return product;
     }
 
 
