@@ -64,7 +64,6 @@ public class ProductController {
     }
 
 
-    // ===== Novo Endpoint para Upload de Planilhas =====
     @Operation(summary = "Upload Excel sheet for product data",
             description = "Processes an Excel file to add or update product data.",
             responses = {

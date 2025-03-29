@@ -36,7 +36,6 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
-                    config.setAllowedOrigins(List.of("*"));
                     config.setAllowedOrigins(List.of("http://localhost:5173"));
                     config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                     config.setAllowedHeaders(List.of("*"));
@@ -46,8 +45,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/user/create").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/products/upload").permitAll()
-                        .requestMatchers("/categories/**", "/products/**", "/suppliers/").authenticated()
+                        .requestMatchers("/categories/**", "/products/**", "/suppliers/**","/products/upload").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
