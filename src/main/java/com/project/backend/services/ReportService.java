@@ -19,7 +19,7 @@ import java.util.List;
 public class ReportService {
 
     private final ProductRepository productRepository;
-    private final ReportRepository reportRepository;
+
 
     public byte[] generateStockReport() throws IOException {
         List<Product> products = productRepository.findAll();
