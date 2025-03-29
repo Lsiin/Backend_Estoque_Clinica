@@ -47,4 +47,6 @@ public class Product {
 
     @Column(nullable = false)
     private LocalDate dataValidade;
+
+
 }

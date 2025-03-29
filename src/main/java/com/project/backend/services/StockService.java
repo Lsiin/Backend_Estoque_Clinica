@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
+
 @Service
 public class StockService {
 
@@ -31,4 +32,6 @@ public class StockService {
 
         stockRepository.save(stock);
     }
+
+
 }
