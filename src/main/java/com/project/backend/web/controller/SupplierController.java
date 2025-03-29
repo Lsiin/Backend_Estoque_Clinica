@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,61 +17,43 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "Suppliers", description = "Supplier management endpoints")
 @RestController
 @RequestMapping("/suppliers")
 public class SupplierController {
 
     @Autowired
     private SupplierServices supplierServices;
-    @Autowired
-    private SupplierRepository supplierRepository;
 
-    @Operation(summary = "Register a supplier",
+    @Operation(summary = "Register a new supplier",
+            description = "Creates a new supplier with validation for required fields and CNPJ format",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Supplier registration successfully",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = Supplier.class))),
-                    @ApiResponse(responseCode = "400", description = "Could not create supplier",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class))),
-                    @ApiResponse(responseCode = "500", description = "Internal error",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "201", description = "Supplier registered successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Supplier.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "409", description = "Conflict - Supplier with this CNPJ already exists",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "422", description = "Unprocessable Entity - Invalid CNPJ format",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
             })
     @PostMapping("/register")
     public ResponseEntity<Supplier> cadastrarFornecedor(@RequestBody Supplier supplier) {
-        if (supplier.getCnpj() == null) {
-            throw new GlobalExceptionHandler.InvalidCnpjFormatException("CNPJ cannot be null");
-        }
-
-        if (supplier.getSocialname() == null) {
-            throw new GlobalExceptionHandler.DuplicateDataException("Social Name cannot be null");
-        }
-
-        if (supplier.getCep() == null) {
-            throw new GlobalExceptionHandler.InvalidCepFormatException("CEP cannot be null");
-        }
-
-        if (supplier.getCategory() == null) {
-            throw new GlobalExceptionHandler.DuplicateDataException("Category cannot be null");
-        }
-
-        if (!isValidCnpj(supplier.getCnpj())) {
-            throw new GlobalExceptionHandler.InvalidCnpjFormatException("CNPJ invalid");
-        }
-
-        Optional<Supplier> existSupplierByCnpj = supplierRepository.findByCnpj(supplier.getCnpj());
-        if (existSupplierByCnpj.isPresent()) {
-            throw new GlobalExceptionHandler.DuplicateDataException("A supplier with this CNPJ already exists.");
-        }
-
         Supplier savedSupplier = supplierServices.registerSupplier(supplier);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSupplier);
     }
 
     @Operation(summary = "Get all suppliers",
+            description = "Retrieves a list of all registered suppliers",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "List of all suppliers",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = Supplier.class))),
+                    @ApiResponse(responseCode = "200", description = "List of suppliers retrieved successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Supplier.class, type = "array"))),
                     @ApiResponse(responseCode = "404", description = "No suppliers found",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
             })
     @GetMapping
     public ResponseEntity<List<Supplier>> getAllFornecedores() {
@@ -81,12 +64,17 @@ public class SupplierController {
         return ResponseEntity.ok(suppliers);
     }
 
-    @Operation(summary = "Find supplier by ID",
+    @Operation(summary = "Get supplier by ID",
+            description = "Retrieves a specific supplier by their unique identifier",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Supplier found",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = Supplier.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Supplier.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid ID supplied",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
                     @ApiResponse(responseCode = "404", description = "Supplier not found",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
             })
     @GetMapping("/get/{id}")
     public ResponseEntity<Supplier> obterFornecedorPorId(@PathVariable Long id) {
@@ -99,21 +87,23 @@ public class SupplierController {
     }
 
     @Operation(summary = "Update a supplier",
+            description = "Updates an existing supplier's information",
             responses = {
                     @ApiResponse(responseCode = "200", description = "Supplier updated successfully",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = Supplier.class))),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = Supplier.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid input data",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
                     @ApiResponse(responseCode = "404", description = "Supplier not found",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "422", description = "Unprocessable Entity - Invalid CNPJ format",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
             })
     @PutMapping("/update/{id}")
     public ResponseEntity<Supplier> updateFornecedor(@PathVariable Long id, @RequestBody Supplier supplier) {
         Optional<Supplier> existSupplier = supplierServices.getFornecedorById(id);
         if (existSupplier.isPresent()) {
-            supplier.setId(id);
-            supplier.setCnpj(supplier.getCnpj());
-            supplier.setSocialname(supplier.getSocialname());
-            supplier.setCep(supplier.getCep());
-            supplier.setCategory(supplier.getCategory());
             Supplier supplierAtualizado = supplierServices.updateFornecedor(supplier);
             return ResponseEntity.ok(supplierAtualizado);
         } else {
@@ -122,11 +112,15 @@ public class SupplierController {
     }
 
     @Operation(summary = "Delete a supplier",
+            description = "Deletes a supplier by their unique identifier",
             responses = {
-                    @ApiResponse(responseCode = "201", description = "Supplier deleted successfully",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = Supplier.class))),
+                    @ApiResponse(responseCode = "204", description = "Supplier deleted successfully"),
+                    @ApiResponse(responseCode = "400", description = "Invalid ID supplied",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
                     @ApiResponse(responseCode = "404", description = "Supplier not found",
-                            content = @Content(mediaType = "application/Json", schema = @Schema(implementation = ErrorResponses.class)))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
             })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> excluirFornecedor(@PathVariable Long id) {
@@ -139,7 +133,5 @@ public class SupplierController {
         }
     }
 
-    private boolean isValidCnpj(String cnpj) {
-        return cnpj.matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
-    }
+
 }

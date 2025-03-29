@@ -34,7 +34,7 @@ public class StockController {
 
     })
 
-    @GetMapping()
+    @GetMapping("/all")
     public List<StockDTO> findAll() {
         List<Stock> stocks = stockRepository.findAll();
         if (stocks.isEmpty()) {

@@ -41,7 +41,7 @@ public class CategoryController {
                     @ApiResponse(responseCode = "200", description = "Categories retrieved successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content(mediaType = "application/json"))
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponses.class))),
             })
     @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {
@@ -54,7 +54,7 @@ public class CategoryController {
                     @ApiResponse(responseCode = "200", description = "Category found successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
                     @ApiResponse(responseCode = "404", description = "Category not found",
-                            content = @Content(mediaType = "application/json"))
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponses.class))),
             })
     @GetMapping("/get/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Long id) {
@@ -68,9 +68,9 @@ public class CategoryController {
                     @ApiResponse(responseCode = "200", description = "Category updated successfully",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Category.class))),
                     @ApiResponse(responseCode = "404", description = "Category not found",
-                            content = @Content(mediaType = "application/json")),
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
                     @ApiResponse(responseCode = "400", description = "Invalid request",
-                            content = @Content(mediaType = "application/json"))
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class))),
             })
     @PutMapping("/update/{id}")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody Category category) {
@@ -82,9 +82,9 @@ public class CategoryController {
     @Operation(summary = "Delete a category",
             responses = {
                     @ApiResponse(responseCode = "204", description = "Category deleted successfully",
-                            content = @Content(mediaType = "application/json")),
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponses.class))),
                     @ApiResponse(responseCode = "404", description = "Category not found",
-                            content = @Content(mediaType = "application/json"))
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponses.class))),
             })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
