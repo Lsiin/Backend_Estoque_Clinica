@@ -11,10 +11,19 @@ import com.project.backend.repositories.ProductRepository;
 import com.project.backend.repositories.StockRepository;
 import com.project.backend.repositories.SupplierRepository;
 import jakarta.transaction.Transactional;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.AbstractPersistable_;
 import org.springframework.stereotype.Service;
 
+import java.io.InputStream;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -116,5 +125,75 @@ public class ProductService {
         }
         return false;
     }
+
+
+    public void processProductSheet(InputStream inputStream) {
+        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+            Sheet sheet = workbook.getSheetAt(0); // Pega a primeira aba da planilha
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) continue; // Ignorar cabeçalho
+    
+                // Ler os dados da célula usando o método universal
+                String nomeProduto = (String) getCellValue(row.getCell(3));
+                Double precoAsDouble = (Double) getCellValue(row.getCell(4));
+                Float preco = precoAsDouble != null ? precoAsDouble.floatValue() : null; // Converter para Float
+                Double quantidadeAsDouble = (Double) getCellValue(row.getCell(5));
+                Integer quantidade = quantidadeAsDouble != null ? quantidadeAsDouble.intValue() : null; // Converter para Integer
+                Double categoriaAsDouble = (Double) getCellValue(row.getCell(6));
+                Long categoriaId = categoriaAsDouble != null ? categoriaAsDouble.longValue() : null; // Converter para Long
+                Double fornecedorAsDouble = (Double) getCellValue(row.getCell(7));
+                Long fornecedorId = fornecedorAsDouble != null ? fornecedorAsDouble.longValue() : null; // Converter para Long
+                LocalDate dataCompra = (LocalDate) getCellValue(row.getCell(1));
+                LocalDate dataValidade = (LocalDate) getCellValue(row.getCell(2));
+    
+                // Criar e preencher ProductDTO
+                ProductDTO productDTO = new ProductDTO();
+                productDTO.setName(nomeProduto);
+                productDTO.setPrice(preco);
+                productDTO.setQuantity(quantidade);
+                productDTO.setDataCompra(dataCompra);
+                productDTO.setDataValidade(dataValidade);
+                productDTO.setCategoryId(categoriaId);
+                productDTO.setSupplierId(fornecedorId);
+    
+                // Salvar o produto usando o método já existente
+                saveProduct(productDTO);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao processar a planilha: " + e.getMessage(), e);
+        }
+    }
+    
+    
+    
+    
+    private Object getCellValue(Cell cell) {
+        if (cell == null) {
+            return null; // Retorna null se a célula estiver vazia
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                String stringValue = cell.getStringCellValue().trim();
+                // Tenta converter o texto para número, se for um número válido
+                if (stringValue.matches("-?\\d+(\\.\\d+)?")) { // Verifica se é um número
+                    return Double.parseDouble(stringValue); // Converte para Double
+                }
+                return stringValue; // Retorna como texto se não for número
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getLocalDateTimeCellValue().toLocalDate(); // Retorna a data como LocalDate
+                } else {
+                    return cell.getNumericCellValue(); // Retorna o número
+                }
+            case BOOLEAN:
+                return cell.getBooleanCellValue(); // Retorna valor booleano
+            case BLANK:
+                return null; // Retorna null para células em branco
+            default:
+                throw new IllegalArgumentException("Tipo de célula não suportado: " + cell.getCellType());
+        }
+    }
+    
 
 }
