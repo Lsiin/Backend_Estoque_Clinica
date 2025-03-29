@@ -52,21 +52,6 @@ public class UserController {
             })
 
 
-
-
-    @GetMapping("/test")
-    public ResponseEntity<String> testEndpoint() {
-        return ResponseEntity.ok("Working");
-    }
-
-    @GetMapping
-    public ResponseEntity<List<User>> getAllUsers() {
-        List<User> users= userService.getAllUsers();
-        return ResponseEntity.ok(users);
-    }
-
-
-
     @PostMapping("/create")
     public ResponseEntity<?> create(@RequestBody @Valid User user, BindingResult bindingResult) {
 
@@ -78,14 +63,9 @@ public class UserController {
             return ResponseEntity.badRequest().body(errors);
         }
 
-        if (user.getName() == null || user.getName().isEmpty()) {
-            return ResponseEntity.badRequest().body(new ErrorResponses("User name cannot be empty"));
-        }
-
         if (!isValidEmail(user.getEmail())) {
             throw new GlobalExceptionHandler.InvalidEmailFormatException("Invalid Email");
         }
-
         if (!isValidCpf(user.getCpf())) {
             throw new GlobalExceptionHandler.InvalidCpfFormatException("Invalid CPF");
         }
@@ -94,15 +74,31 @@ public class UserController {
             throw new GlobalExceptionHandler.InvalidPhoneNumberFormatException("Invalid Phone Number");
         }
 
-        if (user.getBirthday() == null) {
-            System.out.println("User birthday is null");
-            throw new GlobalExceptionHandler.DuplicateDataException("Birthday cannot be null");
+        if (user.getCpf() == null) {
+            return ResponseEntity.badRequest().body(new ErrorResponses("CPF cannot be null"));
         }
 
+        if (user.getPhoneNumber() == null) {
+            return ResponseEntity.badRequest().body(new ErrorResponses("Phone Number cannot be null"));
+        }
 
+        if (user.getName() == null || user.getName().isEmpty()) {
+            return ResponseEntity.badRequest().body(new ErrorResponses("User name cannot be empty"));
+        }
+
+        if (user.getEmail() == null) {
+            return ResponseEntity.badRequest().body(new ErrorResponses("Email cannot be null"));
+        }
+
+        if (user.getBirthday() == null) {
+            return ResponseEntity.badRequest().body(new ErrorResponses("Birthday cannot be null"));
+        }
+        if (user.getUserType() == null) {
+            throw new GlobalExceptionHandler.ResourceNotFoundException("User type cannot be null");
+        }
         try {
             User.UserType.valueOf(user.getUserType().name());
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException | NullPointerException e) {
             throw new GlobalExceptionHandler.EnumIncorretException("Invalid UserType: " + user.getUserType());
         }
 
@@ -111,14 +107,12 @@ public class UserController {
             throw new GlobalExceptionHandler.DuplicateDataException("A user with this email already exists.");
         }
 
-
         Optional<User> existingUserByCpf = userRepository.findByCpf(user.getCpf());
         if (existingUserByCpf.isPresent()) {
             throw new GlobalExceptionHandler.DuplicateDataException("A user with this CPF already exists.");
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         User savedUser = userRepository.save(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
     }
@@ -187,7 +181,38 @@ public class UserController {
                                 "You can only update your own profile");
                     }
 
+                    if (!isValidPhoneNumber(userDetails.getPhoneNumber())) {
+                        throw new GlobalExceptionHandler.InvalidPhoneNumberFormatException("Invalid Phone Number");
+                    }
+                    if (!isValidEmail(userDetails.getEmail())) {
+                        throw new GlobalExceptionHandler.InvalidEmailFormatException("Invalid Email");
+                    }
+                    if (!isValidCpf(userDetails.getCpf())) {
+                        throw new GlobalExceptionHandler.InvalidCpfFormatException("Invalid CPF");
+                    }
 
+                    if (userDetails.getCpf() == null) {
+                        return ResponseEntity.badRequest().body(new ErrorResponses("CPF cannot be null"));
+                    }
+
+                    if (userDetails.getPhoneNumber() == null) {
+                        return ResponseEntity.badRequest().body(new ErrorResponses("Phone Number cannot be null"));
+                    }
+
+                    if (userDetails.getName() == null || userDetails.getName().isEmpty()) {
+                        return ResponseEntity.badRequest().body(new ErrorResponses("User name cannot be empty"));
+                    }
+
+                    if (userDetails.getEmail() == null) {
+                        return ResponseEntity.badRequest().body(new ErrorResponses("Email cannot be null"));
+                    }
+
+                    if (userDetails.getBirthday() == null) {
+                        return ResponseEntity.badRequest().body(new ErrorResponses("Birthday cannot be null"));
+                    }
+                    if (userDetails.getUserType() == null) {
+                        throw new GlobalExceptionHandler.ResourceNotFoundException("User type cannot be null");
+                    }
                     if (!existingUser.getEmail().equals(userDetails.getEmail())) {
                         userRepository.findByEmail(userDetails.getEmail())
                                 .ifPresent(u -> {
@@ -254,6 +279,13 @@ public class UserController {
         } else {
             throw new GlobalExceptionHandler.UserNotFoundException("User not found by id: " + id);
         }
+    }
+
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users= userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
 
