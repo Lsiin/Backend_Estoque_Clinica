@@ -95,6 +95,7 @@ public class UserController {
         }
 
         if (user.getBirthday() == null) {
+            System.out.println("User birthday is null");
             throw new GlobalExceptionHandler.DuplicateDataException("Birthday cannot be null");
         }
 
@@ -109,6 +110,7 @@ public class UserController {
         if (existingUser.isPresent()) {
             throw new GlobalExceptionHandler.DuplicateDataException("A user with this email already exists.");
         }
+
 
         Optional<User> existingUserByCpf = userRepository.findByCpf(user.getCpf());
         if (existingUserByCpf.isPresent()) {
