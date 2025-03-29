@@ -21,8 +21,4 @@ public class Category {
 
     @Column
     private String nameCategory;
-
-    @OneToMany(mappedBy = "category")
-    private List<Supplier> suppliers;
-
 }

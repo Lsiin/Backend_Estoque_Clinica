@@ -25,55 +25,47 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(DuplicateDataException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateDataException(DuplicateDataException ex) {
-        return handleException(ex, HttpStatus.CONFLICT);
-    }
-
-    @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleProductNotFoundException(ProductNotFoundException ex) {
         return handleException(ex, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(InvalidCpfFormatException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidCpfFormatException(InvalidCpfFormatException ex) {
+    @ExceptionHandler(InvalidPriceException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidPriceException(InvalidPriceException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidCepFormatException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidCepFormatException(InvalidCepFormatException ex) {
+    @ExceptionHandler(InvalidQuantityException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidQuantityException(InvalidQuantityException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
-    @ExceptionHandler(InvalidCnpjFormatException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidCnpjFormatException(InvalidCnpjFormatException ex) {
+
+    @ExceptionHandler(InvalidDateException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidDateException(InvalidDateException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(StockInsufficientException.class)
+    public ResponseEntity<Map<String, String>> handleStockInsufficientException(StockInsufficientException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(StockOperationException.class)
+    public ResponseEntity<Map<String, String>> handleStockOperationException(StockOperationException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
 
 
-    @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<Map<String, String>> HandleCategoryNotFoundException(InvalidPhoneNumberFormatException ex) {
-        return handleException(ex, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(InvalidPhoneNumberFormatException.class)
-    public ResponseEntity<Map<String, String>> handleInvalidPhoneNumberFormatException(InvalidPhoneNumberFormatException ex) {
-        return handleException(ex, HttpStatus.BAD_REQUEST);
-    }
-    @ExceptionHandler(SupplierNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleSuplierNotFoundException(SupplierNotFoundException ex) {
-        return handleException(ex, HttpStatus.NOT_FOUND);
-    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage()));
         return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(StockNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleStockNotFoundException(StockNotFoundException ex) {
-        return handleException(ex, HttpStatus.NOT_FOUND);
     }
 
     public static class InvalidEmailFormatException extends RuntimeException {
@@ -88,24 +80,49 @@ public class GlobalExceptionHandler {
         }
     }
 
-    public static class CategoryNotFoundException extends RuntimeException {
-        public CategoryNotFoundException(String message) {
-            super(message);
-        }
-    }
-
     public static class UserNotFoundException extends RuntimeException {
         public UserNotFoundException(String message) {
             super(message);
         }
-
     }
 
-    public static class SupplierNotFoundException extends RuntimeException {
-        public SupplierNotFoundException(String message) {
+
+    public static class ProductNotFoundException extends RuntimeException {
+        public ProductNotFoundException(String message) {
             super(message);
         }
     }
+
+    public static class InvalidPriceException extends RuntimeException {
+        public InvalidPriceException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InvalidQuantityException extends RuntimeException {
+        public InvalidQuantityException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InvalidDateException extends RuntimeException {
+        public InvalidDateException(String message) {
+            super(message);
+        }
+    }
+
+    public static class StockInsufficientException extends RuntimeException {
+        public StockInsufficientException(String message) {
+            super(message);
+        }
+    }
+
+    public static class StockOperationException extends RuntimeException {
+        public StockOperationException(String message) {
+            super(message);
+        }
+    }
+
     public static class InvalidCpfFormatException extends RuntimeException {
         public InvalidCpfFormatException(String message) {
             super(message);
@@ -118,15 +135,32 @@ public class GlobalExceptionHandler {
         }
     }
 
-    public static class InvalidPhoneNumberFormatException extends RuntimeException {
-        public InvalidPhoneNumberFormatException(String message) {
+    public static class InvalidCnpjFormatException extends RuntimeException {
+        public InvalidCnpjFormatException(String message) {
             super(message);
-
         }
     }
 
-    public static class InvalidCnpjFormatException extends RuntimeException {
-        public InvalidCnpjFormatException(String message) {
+    public static class ResourceNotFoundException extends RuntimeException {
+        public ResourceNotFoundException(String message) {
+            super(message);
+        }
+    }
+
+    public static class InvalidPhoneNumberFormatException extends RuntimeException {
+        public InvalidPhoneNumberFormatException(String message) {
+            super(message);
+        }
+    }
+
+    public static class EnumIncorretException extends RuntimeException {
+        public EnumIncorretException(String message) {
+            super(message);
+        }
+    }
+
+    public static class SupplierNotFoundException extends RuntimeException {
+        public SupplierNotFoundException(String message) {
             super(message);
         }
     }
@@ -136,5 +170,4 @@ public class GlobalExceptionHandler {
             super(message);
         }
     }
-
 }

@@ -110,6 +110,10 @@ public class SupplierController {
         Optional<Supplier> existSupplier = supplierServices.getFornecedorById(id);
         if (existSupplier.isPresent()) {
             supplier.setId(id);
+            supplier.setCnpj(supplier.getCnpj());
+            supplier.setSocialname(supplier.getSocialname());
+            supplier.setCep(supplier.getCep());
+            supplier.setCategory(supplier.getCategory());
             Supplier supplierAtualizado = supplierServices.updateFornecedor(supplier);
             return ResponseEntity.ok(supplierAtualizado);
         } else {

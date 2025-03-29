@@ -1,5 +1,6 @@
 package com.project.backend.web.controller;
 
+import com.project.backend.dto.ProductDTO;
 import com.project.backend.entities.Product;
 import com.project.backend.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,8 +9,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
@@ -55,10 +58,28 @@ public class ProductController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = Product.class)))
             })
     @PostMapping("/register")
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-        Product newProduct = productService.saveProduct(product);
+    public ResponseEntity<Product> createProduct(@RequestBody ProductDTO productDTO) {
+        Product newProduct = productService.saveProduct(productDTO);
         return ResponseEntity.status(201).body(newProduct);
     }
+
+
+    @Operation(summary = "Upload Excel sheet for product data",
+            description = "Processes an Excel file to add or update product data.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "File processed successfully"),
+                    @ApiResponse(responseCode = "500", description = "Error processing the file")
+            })
+    @PostMapping("/upload")
+    public ResponseEntity<String> uploadProductSheet(@RequestParam("file") MultipartFile file) {
+        try {
+            productService.processProductSheet(file.getInputStream());
+            return ResponseEntity.ok("Planilha processada com sucesso!");
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao processar a planilha: " + e.getMessage());
+        }
+    }
+
 
     @Operation(summary = "Update a product",
             description = "Updates an existing product by its ID.",
@@ -68,10 +89,12 @@ public class ProductController {
                     @ApiResponse(responseCode = "404", description = "Product not found")
             })
     @PutMapping("/update/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @RequestBody Product product) {
-        return productService.updateProduct(id, product)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<Product> updateProduct(
+            @PathVariable Long id,
+            @RequestBody ProductDTO productDTO) {
+
+        Product updatedProduct = productService.updateProduct(id, productDTO);
+        return ResponseEntity.ok(updatedProduct);
     }
 
 
