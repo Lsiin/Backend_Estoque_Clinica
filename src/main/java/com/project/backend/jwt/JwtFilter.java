@@ -36,13 +36,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // Rotas públicas que não requerem autenticação
-        if (path.startsWith("/auth/") || path.equals("/user/create")) {
+
+        if (path.startsWith("/auth/") ||
+                path.equals("/user/create") ||
+                path.equals("/user/test") ||
+                path.startsWith("/swagger-ui/") ||
+                path.startsWith("/v3/api-docs/")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Restante da lógica original do filtro...
+
         final String authHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;

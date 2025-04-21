@@ -1,6 +1,7 @@
 
 package com.project.backend.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,7 +18,9 @@ public class PurchaseItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "purchase_order_id", nullable = false)
     private PurchaseOrder purchaseOrder;
 

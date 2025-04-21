@@ -10,7 +10,9 @@ import com.project.backend.repositories.CategoryRepository;
 import com.project.backend.repositories.ProductRepository;
 import com.project.backend.repositories.StockRepository;
 import com.project.backend.repositories.SupplierRepository;
+import com.project.backend.web.controller.ErrorResponses;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -19,14 +21,16 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.AbstractPersistable_;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class ProductService {
 
@@ -35,9 +39,14 @@ public class ProductService {
     private ProductRepository productRepository;
 
     @Autowired
+    private StockRepository stockRepository;
+
+    @Autowired
     private StockService stockService;
+
     @Autowired
     private SupplierRepository supplierRepository;
+
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -52,6 +61,21 @@ public class ProductService {
         product.setDataCompra(productDTO.getDataCompra());
         product.setDataValidade(productDTO.getDataValidade());
 
+        if (productDTO.getName() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Name cannot be null");
+        }
+        if (productDTO.getPrice() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Price cannot be null");
+        }
+        if (productDTO.getQuantity() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Quantity cannot be null");
+        }
+        if (productDTO.getDataCompra() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("DataCompra cannot be null");
+        }
+        if (productDTO.getDataValidade() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("DataValidade cannot be null");
+        }
 
         Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
                 .orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
@@ -91,7 +115,27 @@ public class ProductService {
                     .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Supplier not found"));
             product.setSupplier(supplier);
         }
-
+        if (productDTO.getName() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Name cannot be null");
+        }
+        if (productDTO.getPrice() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Price cannot be null");
+        }
+        if (productDTO.getQuantity() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Quantity cannot be null");
+        }
+        if (productDTO.getSupplierId() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Supplier ID cannot be null");
+        }
+        if (productDTO.getCategoryId() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Category ID cannot be null");
+        }
+        if (productDTO.getDataCompra() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("DataCompra cannot be null");
+        }
+        if (productDTO.getDataValidade() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("DataValidade cannot be null");
+        }
 
         return product;
     }
@@ -106,47 +150,42 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-    public Optional<Product> updateProduct(Long id, Product productDetails) {
-        return productRepository.findById(id).map(product -> {
-            product.setName(productDetails.getName());
-            product.setPrice(productDetails.getPrice());
-            product.setQuantity(productDetails.getQuantity());
-            product.setCategory(productDetails.getCategory());
-            product.setSupplier(productDetails.getSupplier());
-            return productRepository.save(product);
-        });
-    }
 
 
+
+
+    @Transactional
     public boolean deleteProduct(Long id) {
-        if (productRepository.existsById(id)) {
+        try {
+            stockRepository.deleteByProductId(id);
             productRepository.deleteById(id);
             return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
         }
-        return false;
     }
 
 
     public void processProductSheet(InputStream inputStream) {
         try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0); // Pega a primeira aba da planilha
+            Sheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
-                if (row.getRowNum() == 0) continue; // Ignorar cabeçalho
+                if (row.getRowNum() == 0) continue;
     
-                // Ler os dados da célula usando o método universal
+
                 String nomeProduto = (String) getCellValue(row.getCell(3));
                 Double precoAsDouble = (Double) getCellValue(row.getCell(4));
-                Float preco = precoAsDouble != null ? precoAsDouble.floatValue() : null; // Converter para Float
+                Float preco = precoAsDouble != null ? precoAsDouble.floatValue() : null;
                 Double quantidadeAsDouble = (Double) getCellValue(row.getCell(5));
-                Integer quantidade = quantidadeAsDouble != null ? quantidadeAsDouble.intValue() : null; // Converter para Integer
+                Integer quantidade = quantidadeAsDouble != null ? quantidadeAsDouble.intValue() : null;
                 Double categoriaAsDouble = (Double) getCellValue(row.getCell(6));
-                Long categoriaId = categoriaAsDouble != null ? categoriaAsDouble.longValue() : null; // Converter para Long
+                Long categoriaId = categoriaAsDouble != null ? categoriaAsDouble.longValue() : null;
                 Double fornecedorAsDouble = (Double) getCellValue(row.getCell(7));
-                Long fornecedorId = fornecedorAsDouble != null ? fornecedorAsDouble.longValue() : null; // Converter para Long
+                Long fornecedorId = fornecedorAsDouble != null ? fornecedorAsDouble.longValue() : null;
                 LocalDate dataCompra = (LocalDate) getCellValue(row.getCell(1));
                 LocalDate dataValidade = (LocalDate) getCellValue(row.getCell(2));
     
-                // Criar e preencher ProductDTO
+
                 ProductDTO productDTO = new ProductDTO();
                 productDTO.setName(nomeProduto);
                 productDTO.setPrice(preco);
@@ -156,7 +195,7 @@ public class ProductService {
                 productDTO.setCategoryId(categoriaId);
                 productDTO.setSupplierId(fornecedorId);
     
-                // Salvar o produto usando o método já existente
+
                 saveProduct(productDTO);
             }
         } catch (Exception e) {
@@ -170,26 +209,26 @@ public class ProductService {
     
     private Object getCellValue(Cell cell) {
         if (cell == null) {
-            return null; // Retorna null se a célula estiver vazia
+            return null;
         }
         switch (cell.getCellType()) {
             case STRING:
                 String stringValue = cell.getStringCellValue().trim();
-                // Tenta converter o texto para número, se for um número válido
-                if (stringValue.matches("-?\\d+(\\.\\d+)?")) { // Verifica se é um número
-                    return Double.parseDouble(stringValue); // Converte para Double
+
+                if (stringValue.matches("-?\\d+(\\.\\d+)?")) {
+                    return Double.parseDouble(stringValue);
                 }
-                return stringValue; // Retorna como texto se não for número
+                return stringValue;
             case NUMERIC:
                 if (DateUtil.isCellDateFormatted(cell)) {
-                    return cell.getLocalDateTimeCellValue().toLocalDate(); // Retorna a data como LocalDate
+                    return cell.getLocalDateTimeCellValue().toLocalDate();
                 } else {
-                    return cell.getNumericCellValue(); // Retorna o número
+                    return cell.getNumericCellValue();
                 }
             case BOOLEAN:
-                return cell.getBooleanCellValue(); // Retorna valor booleano
+                return cell.getBooleanCellValue();
             case BLANK:
-                return null; // Retorna null para células em branco
+                return null;
             default:
                 throw new IllegalArgumentException("Tipo de célula não suportado: " + cell.getCellType());
         }

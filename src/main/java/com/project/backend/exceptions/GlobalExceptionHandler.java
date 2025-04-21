@@ -2,7 +2,6 @@ package com.project.backend.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,17 +12,40 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
     private ResponseEntity<Map<String, String>> handleException(RuntimeException ex, HttpStatus status) {
         Map<String, String> response = new HashMap<>();
         response.put("message", ex.getMessage());
         return ResponseEntity.status(status).body(response);
     }
 
+
+    @ExceptionHandler(DuplicateDataException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateDataException(DuplicateDataException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(InvalidCpfFormatException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidCpfFormatException(InvalidCpfFormatException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidPhoneNumberFormatException.class)
+    public ResponseEntity<Map<String, String>> handleInvalidPhoneNumberFormatException(InvalidPhoneNumberFormatException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
+
+    @ExceptionHandler(EnumIncorretException.class)
+    public ResponseEntity<Map<String, String>> handleEnumIncorrectException(EnumIncorretException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(InvalidEmailFormatException.class)
     public ResponseEntity<Map<String, String>> handleInvalidEmailException(InvalidEmailFormatException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
-
 
     @ExceptionHandler(ProductNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleProductNotFoundException(ProductNotFoundException ex) {
@@ -54,11 +76,30 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleStockOperationException(StockOperationException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleResourceNotFoundException(ResourceNotFoundException ex) {
         return handleException(ex, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(ResourceBeNullException.class)
+    public ResponseEntity<Map<String, String>> handleResourceIsNullException(ResourceBeNullException ex) {
+        return handleException(ex, HttpStatus.BAD_REQUEST);
+    }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleUserNotFoundException(UserNotFoundException ex) {
+        return handleException(ex, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(SupplierNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleSupplierNotFoundException(SupplierNotFoundException ex) {
+        return handleException(ex, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(StockNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleStockNotFoundException(StockNotFoundException ex) {
+        return handleException(ex, HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -68,12 +109,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
+
     public static class InvalidEmailFormatException extends RuntimeException {
         public InvalidEmailFormatException(String message) {
             super(message);
         }
     }
-
+public static class ResourceBeNullException extends RuntimeException {
+        public ResourceBeNullException(String message) {
+            super(message);
+        }
+}
     public static class DuplicateDataException extends RuntimeException {
         public DuplicateDataException(String message) {
             super(message);
@@ -85,7 +131,6 @@ public class GlobalExceptionHandler {
             super(message);
         }
     }
-
 
     public static class ProductNotFoundException extends RuntimeException {
         public ProductNotFoundException(String message) {
