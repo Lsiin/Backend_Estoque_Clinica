@@ -2,7 +2,6 @@ package com.project.backend.services;
 
 
 import com.project.backend.entities.User;
-import com.project.backend.exceptions.GlobalExceptionHandler;
 import com.project.backend.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,4 +17,11 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+
+    public User CreateUser( User user){
+        return userRepository.save(user);
+
+    }
 }
+

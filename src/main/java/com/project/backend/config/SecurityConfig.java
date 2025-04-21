@@ -36,8 +36,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/**", "/user/create", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/categories/**", "/products/**", "/suppliers/**","/api/reports/**","/products/upload").authenticated()
+                                "/auth/**", "/user/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/categories/**", "/products/**", "/suppliers/**","/api/reports/**","/purchases/**","/stock/**").authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

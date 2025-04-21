@@ -12,6 +12,7 @@ import com.project.backend.repositories.StockRepository;
 import com.project.backend.repositories.SupplierRepository;
 import com.project.backend.web.controller.ErrorResponses;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -20,6 +21,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.AbstractPersistable_;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,7 +30,7 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
+@Slf4j
 @Service
 public class ProductService {
 
@@ -37,9 +39,14 @@ public class ProductService {
     private ProductRepository productRepository;
 
     @Autowired
+    private StockRepository stockRepository;
+
+    @Autowired
     private StockService stockService;
+
     @Autowired
     private SupplierRepository supplierRepository;
+
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -146,12 +153,16 @@ public class ProductService {
 
 
 
+
+    @Transactional
     public boolean deleteProduct(Long id) {
-        if (productRepository.existsById(id)) {
+        try {
+            stockRepository.deleteByProductId(id);
             productRepository.deleteById(id);
             return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
         }
-        return false;
     }
 
 
