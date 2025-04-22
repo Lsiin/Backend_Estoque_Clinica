@@ -113,4 +113,9 @@ public class PurchaseService {
     public Optional<PurchaseOrder> getPurchaseOrderById(Long id) {
         return purchaseOrderRepository.findById(id);
     }
+
+    @Transactional
+    public void deletePurchase(Long id) {
+        purchaseOrderRepository.deleteById(id);
+    }
 }
