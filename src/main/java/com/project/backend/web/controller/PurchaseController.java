@@ -101,4 +101,16 @@ public class PurchaseController {
         }
         return ResponseEntity.ok(order.get());
     }
+
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> excluirPurchase(@PathVariable Long id) {
+        Optional<PurchaseOrder> existPurchase = purchaseService.getPurchaseOrderById(id);
+        if (existPurchase.isPresent()) {
+            purchaseService.deletePurchase(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            throw new GlobalExceptionHandler.ResourceNotFoundException("Purchase not found with ID:" + id);
+        }
+    }
 }
