@@ -12,9 +12,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Tag(name = "Suppliers", description = "Supplier management endpoints")
@@ -24,6 +30,9 @@ public class SupplierController {
 
     @Autowired
     private SupplierServices supplierServices;
+
+    @Autowired
+    private SupplierRepository supplierRepository;
 
     @Operation(summary = "Register a new supplier",
             description = "Creates a new supplier with validation for required fields and CNPJ format",
@@ -41,6 +50,28 @@ public class SupplierController {
             })
     @PostMapping("/register")
     public ResponseEntity<Supplier> cadastrarFornecedor(@RequestBody Supplier supplier) {
+        if (supplier.getSocialname() == null || supplier.getSocialname().isEmpty()) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Social name cannot be null");
+        }
+        if (supplier.getCategory() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Category cannot be null");
+        }
+        if (supplier.getCnpj() == null || supplier.getCnpj().isEmpty()) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("CNPJ cannot be null");
+        }
+        if (supplier.getCep() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("CEP cannot be null");
+        }
+
+        if (!isValidCnpj(supplier.getCnpj())) {
+            throw new GlobalExceptionHandler.InvalidCnpjFormatException("CNPJ is invalid");
+        }
+
+        Optional<Supplier> existingSupplier = supplierRepository.findByCnpj(supplier.getCnpj());
+        if (existingSupplier.isPresent()) {
+           throw new GlobalExceptionHandler.DuplicateDataException("A supplier with this CNPJ already exists.");
+        }
+
         Supplier savedSupplier = supplierServices.registerSupplier(supplier);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedSupplier);
     }
@@ -59,7 +90,7 @@ public class SupplierController {
     public ResponseEntity<List<Supplier>> getAllFornecedores() {
         List<Supplier> suppliers = supplierServices.getAllFornecedores();
         if(suppliers.isEmpty()) {
-            throw new GlobalExceptionHandler.UserNotFoundException("Suppliers not found");
+            throw new GlobalExceptionHandler.SupplierNotFoundException("Suppliers not found");
         }
         return ResponseEntity.ok(suppliers);
     }
@@ -101,13 +132,63 @@ public class SupplierController {
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
             })
     @PutMapping("/update/{id}")
-    public ResponseEntity<Supplier> updateFornecedor(@PathVariable Long id, @RequestBody Supplier supplier) {
-        Optional<Supplier> existSupplier = supplierServices.getFornecedorById(id);
-        if (existSupplier.isPresent()) {
-            Supplier supplierAtualizado = supplierServices.updateFornecedor(supplier);
-            return ResponseEntity.ok(supplierAtualizado);
-        } else {
-            return ResponseEntity.notFound().build();
+    public ResponseEntity<Object> updateFornecedor(@PathVariable Long id, @RequestBody Supplier supplierDetails, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getAllErrors().forEach(error -> {
+                String fieldName = ((FieldError) error).getField();
+                errors.put(fieldName, error.getDefaultMessage());
+            });
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        try {
+            Supplier updatedSupplier = supplierRepository.findById(id)
+                    .map(existingSupplier -> {
+                        boolean isAdmin = SecurityContextHolder.getContext().getAuthentication()
+                                .getAuthorities().stream()
+                                .anyMatch(g -> g.getAuthority().equals("ROLE_ADMIN"));
+
+                        boolean isSelf = existingSupplier.getCnpj().equals(
+                                SecurityContextHolder.getContext().getAuthentication().getName());
+                        if (!isAdmin && !isSelf) {
+                            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You can only update suppliers with admin role");
+                        }
+                        if (supplierDetails.getSocialname() == null || supplierDetails.getSocialname().isEmpty()) {
+                            throw new GlobalExceptionHandler.ResourceBeNullException("Social name cannot be null");
+                        }
+                        if (supplierDetails.getCategory() == null) {
+                            throw new GlobalExceptionHandler.ResourceBeNullException("Category cannot be null");
+                        }
+                        if (supplierDetails.getCnpj() == null || supplierDetails.getCnpj().isEmpty()) {
+                            throw new GlobalExceptionHandler.ResourceBeNullException("CNPJ cannot be null");
+                        }
+                        if (supplierDetails.getCep() == null) {
+                            throw new GlobalExceptionHandler.ResourceBeNullException("CEP cannot be null");
+                        }
+                        if (!isValidCnpj(supplierDetails.getCnpj())) {
+                            throw new GlobalExceptionHandler.InvalidCnpjFormatException("CNPJ is invalid");
+                        }
+                        if (!supplierDetails.getCep().matches("\\d{5}-\\d{3}")) {
+                            throw new GlobalExceptionHandler.InvalidCepFormatException("CEP must follow the pattern xxxxx-xxx");
+                        }
+
+                        existingSupplier.setSocialname(supplierDetails.getSocialname());
+                        existingSupplier.setCategory(supplierDetails.getCategory());
+                        existingSupplier.setCnpj(supplierDetails.getCnpj());
+                        existingSupplier.setCep(supplierDetails.getCep());
+
+                        return supplierRepository.save(existingSupplier);
+                    })
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Supplier not found"));
+
+            return ResponseEntity.ok(updatedSupplier);
+        } catch (GlobalExceptionHandler.ResourceBeNullException |
+                 GlobalExceptionHandler.InvalidCnpjFormatException |
+                 GlobalExceptionHandler.InvalidCepFormatException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).body(Map.of("error", e.getReason()));
         }
     }
 
@@ -129,9 +210,11 @@ public class SupplierController {
             supplierServices.deleteFornecedor(id);
             return ResponseEntity.noContent().build();
         } else {
-            return ResponseEntity.notFound().build();
+            throw new GlobalExceptionHandler.SupplierNotFoundException("Supplier not found with ID:" + id);
         }
     }
 
-
+    private boolean isValidCnpj(String cnpj) {
+        return cnpj.matches("\\d{2}\\.\\d{3}\\.\\d{3}/\\d{4}-\\d{2}");
+    }
 }

@@ -2,6 +2,7 @@ package com.project.backend.web.controller;
 
 import com.project.backend.dto.PurchaseOrderDTO;
 import com.project.backend.entities.PurchaseOrder;
+import com.project.backend.exceptions.GlobalExceptionHandler;
 import com.project.backend.services.PurchaseService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -71,7 +72,7 @@ public class PurchaseController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
             })
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<PurchaseOrder>> getAllPurchaseOrders() {
         List<PurchaseOrder> orders = purchaseService.getAllPurchaseOrders();
@@ -95,7 +96,21 @@ public class PurchaseController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<PurchaseOrder> getPurchaseOrderById(@PathVariable Long id) {
         Optional<PurchaseOrder> order = purchaseService.getPurchaseOrderById(id);
-        return order.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        if (order.isEmpty()) {
+            throw new GlobalExceptionHandler.ResourceNotFoundException("PurchaseOrder not found");
+        }
+        return ResponseEntity.ok(order.get());
+    }
+
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> excluirPurchase(@PathVariable Long id) {
+        Optional<PurchaseOrder> existPurchase = purchaseService.getPurchaseOrderById(id);
+        if (existPurchase.isPresent()) {
+            purchaseService.deletePurchase(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            throw new GlobalExceptionHandler.ResourceNotFoundException("Purchase not found with ID:" + id);
+        }
     }
 }
