@@ -1,5 +1,6 @@
 package com.project.backend.web.controller;
 
+import com.project.backend.exceptions.GlobalExceptionHandler;
 import com.project.backend.services.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -38,11 +39,16 @@ public class ReportController {
     @GetMapping("/stock")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<byte[]> generateStockReport() throws IOException {
-        byte[] reportContent = reportService.generateStockReport();
+      try {
+          byte[] reportContent = reportService.generateStockReport();
+          return ResponseEntity.ok()
+                  .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=stock_report.xlsx")
+                  .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                  .body(reportContent);
+      } catch (GlobalExceptionHandler.ResourceNotFoundException ex) {
+          return ResponseEntity.notFound().build();
+      }
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=stock_report.xlsx")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .body(reportContent);
+
     }
 }
