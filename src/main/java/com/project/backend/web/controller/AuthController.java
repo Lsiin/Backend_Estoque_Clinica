@@ -2,7 +2,6 @@ package com.project.backend.web.controller;
 
 import com.project.backend.dto.AuthRequest;
 import com.project.backend.dto.AuthResponse;
-import com.project.backend.entities.Supplier;
 import com.project.backend.entities.User;
 import com.project.backend.jwt.JwtUtil;
 import com.project.backend.jwt.TokenBlacklist;

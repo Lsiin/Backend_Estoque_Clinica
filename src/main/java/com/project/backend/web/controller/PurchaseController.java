@@ -102,7 +102,13 @@ public class PurchaseController {
         return ResponseEntity.ok(order.get());
     }
 
-
+    @Operation(summary = "Delete purchase order by ID",
+    responses = {
+            @ApiResponse(responseCode = "200", description = "Purchase order found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = PurchaseOrderDTO.class))),
+            @ApiResponse(responseCode = "404", description = "Purchase order not found",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
+    })
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> excluirPurchase(@PathVariable Long id) {
         Optional<PurchaseOrder> existPurchase = purchaseService.getPurchaseOrderById(id);

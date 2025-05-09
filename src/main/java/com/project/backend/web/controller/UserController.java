@@ -1,5 +1,6 @@
 package com.project.backend.web.controller;
 
+import com.project.backend.entities.Category;
 import com.project.backend.entities.Product;
 import com.project.backend.entities.User;
 import com.project.backend.exceptions.GlobalExceptionHandler;
@@ -281,7 +282,13 @@ public class UserController {
         }
     }
 
-
+    @Operation(summary = "Retrieve all Users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponses.class))),
+            })
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users= userService.getAllUsers();
