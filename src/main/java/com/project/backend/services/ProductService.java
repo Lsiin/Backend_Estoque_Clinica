@@ -23,6 +23,7 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.domain.AbstractPersistable_;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -165,26 +166,43 @@ public class ProductService {
         }
     }
 
+public ResponseEntity<String> processProductSheet(InputStream inputStream) {
+    try (Workbook workbook = WorkbookFactory.create(inputStream)) {
+        Sheet sheet = workbook.getSheetAt(0);
+        System.out.println("🟢 Planilha carregada com sucesso!");
 
-    public void processProductSheet(InputStream inputStream) {
-        try (Workbook workbook = WorkbookFactory.create(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
-            for (Row row : sheet) {
-                if (row.getRowNum() == 0) continue;
-    
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) continue;
+
+            try {
+                System.out.println("🔹 Processando linha: " + row.getRowNum());
 
                 String nomeProduto = (String) getCellValue(row.getCell(3));
+                System.out.println("🔹 Nome do produto: " + nomeProduto);
+
                 Double precoAsDouble = (Double) getCellValue(row.getCell(4));
-                Float preco = precoAsDouble != null ? precoAsDouble.floatValue() : null;
+                Float preco = precoAsDouble != null ? precoAsDouble.floatValue() : 0.0f;
+
+                System.out.println("🔹 Preço: " + preco);
+
                 Double quantidadeAsDouble = (Double) getCellValue(row.getCell(5));
-                Integer quantidade = quantidadeAsDouble != null ? quantidadeAsDouble.intValue() : null;
+                Integer quantidade = quantidadeAsDouble != null ? quantidadeAsDouble.intValue() : 0;
+
                 Double categoriaAsDouble = (Double) getCellValue(row.getCell(6));
                 Long categoriaId = categoriaAsDouble != null ? categoriaAsDouble.longValue() : null;
+
                 Double fornecedorAsDouble = (Double) getCellValue(row.getCell(7));
                 Long fornecedorId = fornecedorAsDouble != null ? fornecedorAsDouble.longValue() : null;
+
                 LocalDate dataCompra = (LocalDate) getCellValue(row.getCell(1));
+                if (dataCompra == null) {
+                    dataCompra = LocalDate.now();
+                }
+
                 LocalDate dataValidade = (LocalDate) getCellValue(row.getCell(2));
-    
+                if (dataValidade == null) {
+                    dataValidade = LocalDate.now().plusMonths(6);
+                }
 
                 ProductDTO productDTO = new ProductDTO();
                 productDTO.setName(nomeProduto);
@@ -194,16 +212,22 @@ public class ProductService {
                 productDTO.setDataValidade(dataValidade);
                 productDTO.setCategoryId(categoriaId);
                 productDTO.setSupplierId(fornecedorId);
-    
 
+                System.out.println("✅ Salvando produto: " + nomeProduto);
                 saveProduct(productDTO);
+            } catch (Exception e) {
+                System.err.println("❌ Erro ao processar uma linha da planilha: " + e.getMessage());
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Erro ao processar a planilha: " + e.getMessage(), e);
         }
+        return ResponseEntity.ok("Planilha processada com sucesso!");
+    } catch (Exception e) {
+        System.err.println("❌ Erro ao processar planilha: " + e.getMessage());
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao processar planilha: " + e.getMessage());
     }
-    
+}
+
     
     
     
