@@ -1,6 +1,6 @@
 package com.project.backend.entities;
 
-import com.project.backend.exceptions.GlobalExceptionHandler;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -63,4 +63,6 @@ public class User {
     public enum UserType {
         USER, ADMIN
     }
+
+
 }

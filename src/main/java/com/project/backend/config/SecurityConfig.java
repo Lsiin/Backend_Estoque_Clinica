@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -37,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/**", "/user/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/categories/**", "/products/**", "/suppliers/**","/api/reports/**","/purchases/**","/stock/**").authenticated()
+                        .requestMatchers("/categories/**", "/products/**", "/suppliers/**","/api/reports/**","/purchases/**","/stock/**", "/profile").authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -46,6 +47,12 @@ public class SecurityConfig {
                 .build();
     }
 
+
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth.inMemoryAuthentication()
+                .withUser("user")
+                .password(passwordEncoder().encode("password"))
+                .roles("USER");}
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authConfig) throws Exception {
