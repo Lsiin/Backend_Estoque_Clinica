@@ -28,7 +28,6 @@ public class UserProfile {
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         UserProfileDTO profile = new UserProfileDTO(
-                user.getId(),
                 user.getName(),
                 user.getEmail(),
                 user.getCpf(),

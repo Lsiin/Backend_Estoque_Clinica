@@ -13,7 +13,7 @@ public class UserProfileDTO {
     private String phone;
     private LocalDate birthDay;
 
-    public UserProfileDTO(Long id, String name, String email, String cpf, String phone, LocalDate birthDay) {
+    public UserProfileDTO( String name, String email, String cpf, String phone, LocalDate birthDay) {
         this.name = name;
         this.email = email;
         this.cpf = cpf;
