@@ -1,5 +1,7 @@
 package com.project.backend.web.controller;
 
+import com.project.backend.dto.UserProfileDTO;
+import com.project.backend.entities.Category;
 import com.project.backend.entities.Product;
 import com.project.backend.entities.User;
 import com.project.backend.exceptions.GlobalExceptionHandler;
@@ -16,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -281,7 +285,13 @@ public class UserController {
         }
     }
 
-
+    @Operation(summary = "Retrieve all Users",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Users retrieved successfully",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = User.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content(mediaType = "application/json",schema = @Schema(implementation = ErrorResponses.class))),
+            })
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
         List<User> users= userService.getAllUsers();
