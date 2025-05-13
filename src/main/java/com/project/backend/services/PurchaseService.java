@@ -1,5 +1,6 @@
 package com.project.backend.services;
 
+import com.itextpdf.text.DocumentException;
 import com.project.backend.dto.PurchaseOrderDTO;
 import com.project.backend.entities.*;
 import com.project.backend.exceptions.GlobalExceptionHandler;
@@ -9,6 +10,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -118,4 +121,5 @@ public class PurchaseService {
     public void deletePurchase(Long id) {
         purchaseOrderRepository.deleteById(id);
     }
+
 }

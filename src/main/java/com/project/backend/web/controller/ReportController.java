@@ -1,5 +1,6 @@
 package com.project.backend.web.controller;
 
+import com.itextpdf.text.DocumentException;
 import com.project.backend.exceptions.GlobalExceptionHandler;
 import com.project.backend.services.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,4 +52,14 @@ public class ReportController {
 
 
     }
+    @GetMapping("/pdf")
+    public ResponseEntity<byte[]> downloadPdfReport() throws DocumentException {
+        byte[] report = reportService.generateStockReportPdf();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=estoque.pdf")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(report);
+    }
+
 }
