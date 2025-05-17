@@ -72,11 +72,24 @@ public class ReportService {
         PdfWriter.getInstance(document, outputStream);
         document.open();
 
-        Font font = FontFactory.getFont(FontFactory.TIMES, 10, Font.BOLD);
-        Paragraph paragraph = new Paragraph("Relatório de Estoque", font);
-        paragraph.setAlignment(Element.ALIGN_CENTER);
-        document.add(paragraph);
+        Font titleFont = FontFactory.getFont(FontFactory.TIMES, 14, Font.BOLD);
+        Font subtitleFont = FontFactory.getFont(FontFactory.TIMES, 10, Font.NORMAL);
+
+
+        Paragraph title = new Paragraph("Relatório de Estoque", titleFont);
+        title.setAlignment(Element.ALIGN_CENTER);
+        document.add(title);
+
+
+        String dataAtual = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date());
+        Paragraph dataGeracao = new Paragraph("Data: " + dataAtual, subtitleFont);
+        dataGeracao.setAlignment(Element.ALIGN_CENTER);
+        document.add(dataGeracao);
+
+
         document.add(Chunk.NEWLINE);
+
+
         PdfPTable table = new PdfPTable(8);
         table.setWidthPercentage(100);
         table.setSpacingBefore(10);
@@ -106,5 +119,6 @@ public class ReportService {
         document.close();
         return outputStream.toByteArray();
     }
+
 }
 
