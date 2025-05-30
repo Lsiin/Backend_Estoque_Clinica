@@ -39,4 +39,6 @@ public class Supplier {
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
+    public Supplier(long id, String fornecedorA, String number, String mail, String number1) {
+    }
 }
