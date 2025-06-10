@@ -59,6 +59,15 @@ public class User {
     @Column(nullable = false)
     private UserType userType;
 
+    public void setUsername(String user1) {
+        
+    }
+
+    public String getUsername() {
+
+        return "";
+    }
+
 
     public enum UserType {
         USER, ADMIN
