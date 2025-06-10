@@ -54,14 +54,6 @@ public class ProductService {
 
     public Product saveProduct(ProductDTO productDTO) {
 
-
-        Product product = new Product();
-        product.setName(productDTO.getName());
-        product.setPrice(productDTO.getPrice());
-        product.setQuantity(productDTO.getQuantity());
-        product.setDataCompra(productDTO.getDataCompra());
-        product.setDataValidade(productDTO.getDataValidade());
-
         if (productDTO.getName() == null) {
             throw new GlobalExceptionHandler.ResourceBeNullException("Name cannot be null");
         }
@@ -77,15 +69,27 @@ public class ProductService {
         if (productDTO.getDataValidade() == null) {
             throw new GlobalExceptionHandler.ResourceBeNullException("DataValidade cannot be null");
         }
+        if (productDTO.getSupplierId() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Supplier ID cannot be null");
+        }
+        if (productDTO.getCategoryId() == null) {
+            throw new GlobalExceptionHandler.ResourceBeNullException("Category ID cannot be null");
+        }
+
 
         Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
-                .orElseThrow(() -> new IllegalArgumentException("Supplier not found"));
-
+                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Supplier not found"));
 
         Category category = categoryRepository.findById(productDTO.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Category not found"));
 
 
+        Product product = new Product();
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+        product.setDataCompra(productDTO.getDataCompra());
+        product.setDataValidade(productDTO.getDataValidade());
         product.setSupplier(supplier);
         product.setCategory(category);
 
@@ -102,20 +106,7 @@ public class ProductService {
 
     @Transactional
     public Product updateProduct(Long id, ProductDTO productDTO) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Product not found"));
 
-        product.setName(productDTO.getName());
-        product.setPrice(productDTO.getPrice());
-        product.setQuantity(productDTO.getQuantity());
-        product.setDataCompra(productDTO.getDataCompra());
-        product.setDataValidade(productDTO.getDataValidade());
-
-        if (productDTO.getSupplierId() != null) {
-            Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
-                    .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Supplier not found"));
-            product.setSupplier(supplier);
-        }
         if (productDTO.getName() == null) {
             throw new GlobalExceptionHandler.ResourceBeNullException("Name cannot be null");
         }
@@ -138,7 +129,29 @@ public class ProductService {
             throw new GlobalExceptionHandler.ResourceBeNullException("DataValidade cannot be null");
         }
 
-        return product;
+
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Product not found"));
+
+
+        Supplier supplier = supplierRepository.findById(productDTO.getSupplierId())
+                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Supplier not found"));
+
+
+        Category category = categoryRepository.findById(productDTO.getCategoryId())
+                .orElseThrow(() -> new GlobalExceptionHandler.ResourceNotFoundException("Category not found"));
+
+
+        product.setName(productDTO.getName());
+        product.setPrice(productDTO.getPrice());
+        product.setQuantity(productDTO.getQuantity());
+        product.setDataCompra(productDTO.getDataCompra());
+        product.setDataValidade(productDTO.getDataValidade());
+        product.setSupplier(supplier);
+        product.setCategory(category);
+
+
+        return productRepository.save(product);
     }
 
 
