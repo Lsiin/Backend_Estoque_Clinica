@@ -4,12 +4,15 @@ import com.project.backend.dto.PurchaseOrderDTO;
 import com.project.backend.entities.PurchaseOrder;
 import com.project.backend.exceptions.GlobalExceptionHandler;
 import com.project.backend.services.PurchaseService;
+import com.project.backend.services.PurchaseReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +27,9 @@ public class PurchaseController {
 
     @Autowired
     private PurchaseService purchaseService;
+
+    @Autowired
+    private PurchaseReportService purchaseReportService;
 
     @Operation(summary = "Create a new purchase order",
             responses = {
@@ -100,6 +106,48 @@ public class PurchaseController {
             throw new GlobalExceptionHandler.ResourceNotFoundException("PurchaseOrder not found");
         }
         return ResponseEntity.ok(order.get());
+    }
+
+    @Operation(summary = "Generate PDF report for purchase order",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "PDF report generated successfully",
+                            content = @Content(mediaType = "application/pdf")),
+                    @ApiResponse(responseCode = "404", description = "Purchase order not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
+            })
+    @GetMapping("/{id}/report/pdf")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<byte[]> generatePdfReport(@PathVariable Long id) {
+        try {
+            byte[] report = purchaseReportService.generatePdfReport(id);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("filename", "purchase-order-" + id + ".pdf");
+            return ResponseEntity.ok().headers(headers).body(report);
+        } catch (Exception e) {
+            throw new GlobalExceptionHandler.ResourceNotFoundException("Error generating PDF report: " + e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Generate Excel report for purchase order",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Excel report generated successfully",
+                            content = @Content(mediaType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")),
+                    @ApiResponse(responseCode = "404", description = "Purchase order not found",
+                            content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponses.class)))
+            })
+    @GetMapping("/{id}/report/excel")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<byte[]> generateExcelReport(@PathVariable Long id) {
+        try {
+            byte[] report = purchaseReportService.generateExcelReport(id);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("filename", "purchase-order-" + id + ".xlsx");
+            return ResponseEntity.ok().headers(headers).body(report);
+        } catch (Exception e) {
+            throw new GlobalExceptionHandler.ResourceNotFoundException("Error generating Excel report: " + e.getMessage());
+        }
     }
 
     @Operation(summary = "Delete purchase order by ID",
